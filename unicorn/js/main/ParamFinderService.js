@@ -21,13 +21,11 @@
 import getPortablePython from './PortablePython';
 import childProcess from 'child_process';
 import EventEmitter from 'events';
-import path from 'path';
+
 import UserError from './UserError';
+import Utils from './Utils';
 
 const PYTHON_EXECUTABLE = getPortablePython();
-const PARAM_FINDER_PATH = path.join(
-  __dirname, '..', '..', 'py', 'unicorn_backend', 'param_finder_runner.py'
-);
 
 /**
  * Thrown when attempting to create more than 1 param finder per metric
@@ -95,10 +93,15 @@ export class ParamFinderService extends EventEmitter {
       throw new DuplicateIDError();
     }
 
-    const params = [PARAM_FINDER_PATH,
+    const params = [
+      '-m', 'unicorn_backend.param_finder_runner',
       '--input', JSON.stringify(inputOpt)
     ];
-    const child = childProcess.spawn(PYTHON_EXECUTABLE, params);
+    const child = childProcess.spawn(
+      PYTHON_EXECUTABLE,
+      params,
+      {env: Utils.createEnvWithPythonpath()}
+    );
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 

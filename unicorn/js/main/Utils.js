@@ -16,11 +16,42 @@
 // http://numenta.org/licenses/
 
 import crypto from 'crypto';
+import path from 'path';
+import process from 'process';
 
 import muiTheme from '../browser/lib/MaterialUI/UnicornTheme';
 
 
 export default class Utils {
+  /**
+   * Create a copy of environment varialbes with PYTHONPATH containing the
+   * necessary locations for spawning Unicorn's python apps.
+   * @return {object} environment variable key/value pairs
+   */
+  static createEnvWithPythonpath() {
+    /* eslint-disable no-process-env */
+
+    /* Duplicate process.env */
+    let env = JSON.parse(JSON.stringify(process.env));
+
+    const unicornBackendParent = path.normalize(
+      path.join(__dirname, '..', '..', 'py')
+    );
+
+    if (env.PYTHONPATH) {
+      /* Technically, this check could be more bullet-proof */
+      if (!env.PYTHONPATH.includes(unicornBackendParent)) {
+        env.PYTHONPATH = (
+          `${ env.PYTHONPATH } ${ path.delimiter } `
+          `${ unicornBackendParent }`
+        );
+      }
+    } else {
+      env.PYTHONPATH = unicornBackendParent;
+    }
+
+    return env;
+  }
 
   /**
    * Genereate unique hashed UID based on seed string and SHA1.

@@ -21,14 +21,12 @@
 import getPortablePython from './PortablePython';
 import childProcess from 'child_process';
 import EventEmitter from 'events';
-import path from 'path';
 import system from 'os';
+
 import UserError from './UserError';
+import Utils from './Utils';
 
 const PYTHON_EXECUTABLE = getPortablePython();
-const MODEL_RUNNER_PATH = path.join(
-  __dirname, '..', '..', 'py', 'unicorn_backend', 'model_runner_2.py'
-);
 
 /**
  * Thrown when attempting to create more models than allowed by the system.
@@ -106,12 +104,17 @@ export class ModelService extends EventEmitter {
       throw new DuplicateIDError();
     }
 
-    const params = [MODEL_RUNNER_PATH,
+    const params = [
+      '-m', 'unicorn_backend.model_runner_2',
       '--input', JSON.stringify(inputOpt),
       '--agg', JSON.stringify(aggregationOpt),
       '--model', JSON.stringify(modelOpt)
     ];
-    const child = childProcess.spawn(PYTHON_EXECUTABLE, params);
+    const child = childProcess.spawn(
+      PYTHON_EXECUTABLE,
+      params,
+      {env: Utils.createEnvWithPythonpath()}
+    );
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 
