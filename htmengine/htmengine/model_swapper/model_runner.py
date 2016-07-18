@@ -507,12 +507,12 @@ class ModelRunner(object):
 
       currentRunInputSamples.append(row.data)
 
-      multStepBestPredictions = r.inferences.get("multiStepBestPredictions", {})
       return ModelInferenceResult(
         rowID=row.rowID,
         status=0,
         anomalyScore=r.inferences["anomalyScore"],
-        multiStepBestPredictions=multStepBestPredictions)
+        multiStepBestPredictions=r.inferences.get("multiStepBestPredictions",
+                                                  {}))
 
     except (Exception, _ModelRunnerError) as e:  # pylint: disable=W0703
       self._logger.exception("%r: Inference failed for row=%r", self, row)

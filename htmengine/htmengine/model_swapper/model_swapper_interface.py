@@ -382,7 +382,8 @@ class ModelInferenceResult(_ModelRequestResultBase):
   def __init__(self, rowID, status, anomalyScore=None,
                multiStepBestPredictions=None,
                errorMessage=None):
-    """ __init__(rowID, status, anomalyScore, multiStepBestPredictions) or
+    """ __init__(rowID, status, anomalyScore) or
+        __init__(rowID, status, anomalyScore, multiStepBestPredictions) or
         __init__(rowID, status, errorMessage)
 
     :param rowID: rowID id of the corresponding input record
@@ -403,7 +404,8 @@ class ModelInferenceResult(_ModelRequestResultBase):
       assert isinstance(anomalyScore, (int, long, float)), (
         "Expected numeric anomaly score with status=0, but got: " +
         repr(anomalyScore))
-      assert isinstance(multiStepBestPredictions, dict), (
+      assert (multiStepBestPredictions is None or
+              isinstance(multiStepBestPredictions, dict)), (
         "Expected multistep best predictions as dict with status=0, but got: " +
         repr(multiStepBestPredictions))
       assert errorMessage is None, (
@@ -414,6 +416,9 @@ class ModelInferenceResult(_ModelRequestResultBase):
         repr(errorMessage))
       assert anomalyScore is None, (
         "Unexpected anomaly score with non-zero status: " + repr(errorMessage))
+      assert multiStepBestPredictions is None, (
+        "Unexpected multiStepBestPredictions with non-zero status: " +
+        repr(errorMessage))
 
     self.rowID = rowID
     self.status = status
