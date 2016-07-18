@@ -715,9 +715,11 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(
-        rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore1),
+        rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore1,
+        multiStepBestPredictions={}),
       ModelInferenceResult(
-        rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore2),
+        rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore2,
+        multiStepBestPredictions={}),
     ]
 
     swapperMock.submitResults.assert_called_once_with(
@@ -806,9 +808,11 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(
-        rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore1),
+        rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore1,
+        multiStepBestPredictions={}),
       ModelInferenceResult(
-        rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore2),
+        rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore2,
+        multiStepBestPredictions={}),
     ]
 
     swapperMock.submitResults.assert_called_once_with(
@@ -902,7 +906,8 @@ class TestModelRunner(unittest.TestCase):
     # Verify emitted results
     requestObjects = requests[0].objects
     expectedResults = [
-      ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score)
+      ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score,
+                           multiStepBestPredictions={})
       for rowid, score in zip(
         [obj.rowID for obj in requestObjects], anomalyScores)
     ]
@@ -1017,9 +1022,11 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(
-        rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore3),
+        rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore3,
+        multiStepBestPredictions={}),
       ModelInferenceResult(
-        rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore4),
+        rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore4,
+        multiStepBestPredictions={}),
     ]
 
     swapperMock.submitResults.assert_called_once_with(
@@ -1126,7 +1133,8 @@ class TestModelRunner(unittest.TestCase):
     # Verify emitted results
     requestObjects = requests[0].objects
     expectedResults = [
-      ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score)
+      ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score,
+                           multiStepBestPredictions={})
       for rowid, score in zip(
         [obj.rowID for obj in requestObjects], anomalyScores[2:])
     ]

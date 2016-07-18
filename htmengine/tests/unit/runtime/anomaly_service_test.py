@@ -267,9 +267,8 @@ class CommandResultTestCase(unittest.TestCase):
     class MetricRowSpec(object):
       status = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.CREATE_PENDING)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.CREATE_PENDING)
     repoMock.getMetricWithSharedLock.return_value = metricRowMock
 
     runner = anomaly_service.AnomalyService()
@@ -295,9 +294,8 @@ class CommandResultTestCase(unittest.TestCase):
     class MetricRowSpec(object):
       status = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ACTIVE)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.ACTIVE)
     repoMock.getMetric.return_value = metricRowMock
 
     runner = anomaly_service.AnomalyService()
@@ -320,9 +318,7 @@ class CommandResultTestCase(unittest.TestCase):
     class MetricRowSpec(object):
       status = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ERROR)
+    metricRowMock = Mock(spec_set=MetricRowSpec, status=MetricStatus.ERROR)
     repoMock.getMetric.return_value = metricRowMock
 
     runner = anomaly_service.AnomalyService()
@@ -408,7 +404,8 @@ class InferenceResultTestCase(unittest.TestCase):
     """
     batch = model_swapper_interface._ConsumedResultBatch(
       modelID="abcdef",
-      objects=[ModelInferenceResult(rowID=1, status=0, anomalyScore=0)],
+      objects=[ModelInferenceResult(rowID=1, status=0, anomalyScore=0,
+                                    multiStepBestPredictions={})],
       ack=Mock(spec_set=(lambda multiple: None))
     )
 
@@ -453,6 +450,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
+      multi_step_best_predictions=0,
       display_value=0
     )
     metricDataRows=[metricDataRow]
@@ -479,6 +477,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
+      multi_step_best_predictions=0,
       display_value=0
     )
 
@@ -491,6 +490,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime2,
       raw_anomaly_score=0.5,
       anomaly_score=0.7,
+      multi_step_best_predictions=0,
       display_value=2
     )
 
@@ -792,7 +792,8 @@ class InferenceResultTestCase(unittest.TestCase):
       runner._scrubInferenceResultsAndInitMetricData(
           engine=engineMock,
           inferenceResults=[ModelInferenceResult(rowID=1, status=0,
-                                                 anomalyScore=0)],
+                                                 anomalyScore=0,
+                                                 multiStepBestPredictions={})],
           metricDataRows=[metricRowDataMock],
           metricObj=metricRowMock)
 

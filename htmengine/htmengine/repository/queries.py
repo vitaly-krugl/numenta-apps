@@ -129,7 +129,8 @@ def deleteModel(conn, metricId):
     update = (schema.metric_data.update() # pylint: disable=E1120
               .values(anomaly_score=None,
                       raw_anomaly_score=None,
-                      display_value=None)
+                      display_value=None,
+                      multi_step_best_predictions=None)
               .where(schema.metric_data.c.uid == metricId))
 
     conn.execute(update)

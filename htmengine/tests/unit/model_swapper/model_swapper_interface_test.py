@@ -344,7 +344,8 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     status = 0
     anomalyScore = 1.95
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      anomalyScore=anomalyScore)
+                                           anomalyScore=anomalyScore,
+                                           multiStepBestPredictions={})
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
@@ -398,7 +399,8 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     status = 0
     anomalyScore = 9.72
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      anomalyScore=anomalyScore)
+                                           anomalyScore=anomalyScore,
+                                           multiStepBestPredictions={})
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
@@ -498,8 +500,10 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
     resultBatch = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions={}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions={})
       ]
     batchState = BatchPackager.marshal(batch=resultBatch)
     msg = ResultMessagePackager.marshal(modelID="foobar", batchState=batchState)
@@ -1007,8 +1011,10 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions={}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions={})
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1037,8 +1043,10 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions={}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions={})
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1073,8 +1081,10 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions={}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions={})
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1113,8 +1123,10 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     expectedResults = (
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9)
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3,
+                           multiStepBestPredictions={}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9,
+                           multiStepBestPredictions={})
     )
     modelID = "foobar"
     msg = ResultMessagePackager.marshal(

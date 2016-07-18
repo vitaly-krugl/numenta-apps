@@ -185,7 +185,7 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
                    metricObj.uid, metricName)
 
 
-  def monitorMetric(self, modelSpec):
+  def monitorMetric(self, modelSpec, classifierEnabled=False):
     """ Start monitoring a metric; perform model creation logic specific to
     custom metrics.
 
@@ -241,6 +241,9 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
             "max": max-value  # optional
           }
         }
+
+    :param classifierEnabled: Value to be set for model params' 'clEnable'
+     attribute
 
     :returns: datasource-specific unique model identifier
 
@@ -319,7 +322,8 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
       stats = {"min": minVal, "max": maxVal, "minResolution": minResolution}
       self._log.debug("monitorMetric: metric=%s, stats=%r", metricId, stats)
 
-      swarmParams = scalar_metric_utils.generateSwarmParams(stats)
+      swarmParams = scalar_metric_utils.generateSwarmParams(stats,
+                                                            classifierEnabled)
 
     self._startMonitoringWithRetries(metricId, modelSpec, swarmParams)
 
