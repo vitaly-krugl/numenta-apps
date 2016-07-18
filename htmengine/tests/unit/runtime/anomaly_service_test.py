@@ -450,7 +450,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
-      multi_step_best_predictions=0,
+      multi_step_best_predictions={},
       display_value=0
     )
     metricDataRows=[metricDataRow]
@@ -477,7 +477,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
-      multi_step_best_predictions=0,
+      multi_step_best_predictions={},
       display_value=0
     )
 
@@ -490,7 +490,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime2,
       raw_anomaly_score=0.5,
       anomaly_score=0.7,
-      multi_step_best_predictions=0,
+      multi_step_best_predictions={},
       display_value=2
     )
 

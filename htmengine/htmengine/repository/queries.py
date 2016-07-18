@@ -101,9 +101,9 @@ def deleteMetric(conn, metricId):
 
 
 def deleteModel(conn, metricId):
-  """Delete the model by reseting model-specific attributes.
+  """Delete the model by resetting model-specific attributes.
   This method will also make sure the data integrity is kept by removing any
-  model related data when necessary, either at the model level or at the
+  model-related data when necessary, either at the model level or at the
   server/instance level
 
   :param conn: SQLAlchemy connection object
@@ -134,7 +134,6 @@ def deleteModel(conn, metricId):
               .where(schema.metric_data.c.uid == metricId))
 
     conn.execute(update)
-
 
 
 
