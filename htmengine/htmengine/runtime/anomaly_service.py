@@ -462,7 +462,8 @@ class AnomalyService(object):
           ts=epochFromNaiveUTCDatetime(row.timestamp),
           value=row.metric_value,
           rawAnomaly=row.raw_anomaly_score,
-          anomaly=row.anomaly_score
+          anomaly=row.anomaly_score,
+          multiStepBestPredictions=json.dumps(row.multi_step_best_predictions)
         )
         for row in dataRows
       ]

@@ -405,7 +405,7 @@ class InferenceResultTestCase(unittest.TestCase):
     batch = model_swapper_interface._ConsumedResultBatch(
       modelID="abcdef",
       objects=[ModelInferenceResult(rowID=1, status=0, anomalyScore=0,
-                                    multiStepBestPredictions={})],
+                                    multiStepBestPredictions={1:1})],
       ack=Mock(spec_set=(lambda multiple: None))
     )
 
@@ -450,7 +450,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
-      multi_step_best_predictions={},
+      multi_step_best_predictions={1:1},
       display_value=0
     )
     metricDataRows=[metricDataRow]
@@ -477,7 +477,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
-      multi_step_best_predictions={},
+      multi_step_best_predictions={1:1},
       display_value=0
     )
 
@@ -490,7 +490,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime2,
       raw_anomaly_score=0.5,
       anomaly_score=0.7,
-      multi_step_best_predictions={},
+      multi_step_best_predictions={2:2},
       display_value=2
     )
 
@@ -550,16 +550,20 @@ class InferenceResultTestCase(unittest.TestCase):
       self.assertEqual(resultRow["value"], inputRow.metric_value)
       self.assertEqual(resultRow["rawAnomaly"], inputRow.raw_anomaly_score)
       self.assertEqual(resultRow["anomaly"], inputRow.anomaly_score)
+      self.assertEqual(resultRow["multiStepBestPredictions"],
+                       json.dumps(inputRow.multi_step_best_predictions))
 
     for resultRow, inputRow in zip(resultRows, dataRows):
       validateResultRow(resultRow, inputRow)
 
     # Make sure it can be serialized and deserialized
     serializedMsg = anomaly_service.AnomalyService._serializeModelResult(msg)
-    print "json msg size:", len(json.dumps(msg)), "serialized msg size:", len(serializedMsg)
-    print msg
+    g_log.debug("json msg size: {} serialized msg size: {}".format(
+      len(json.dumps(msg)), len(serializedMsg)))
+    g_log.debug(str(msg))
     deserializedMsg = anomaly_service.AnomalyService.deserializeModelResult(
       serializedMsg)
+    self.maxDiff = None
     self.assertEqual(deserializedMsg, msg)
 
 
