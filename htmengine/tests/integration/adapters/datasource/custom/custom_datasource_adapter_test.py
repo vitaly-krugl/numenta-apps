@@ -187,7 +187,7 @@ class CustomDatasourceAdapterTest(TestCaseBase):
       g_log.info("Waiting for model to become active")
       self.checkModelIsActive(metricId)
 
-      g_log.info("Deleteing htmengine custom metric with active model: "
+      g_log.info("Deleting htmengine custom metric with active model: "
                  "name=%s",
                  metricName)
       adapter.deleteMetricByName(metricName)

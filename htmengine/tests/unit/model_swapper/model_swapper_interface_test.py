@@ -343,16 +343,19 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     rowID = 1
     status = 0
     anomalyScore = 1.95
+    predictions = {1: 1.1}
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
                                            anomalyScore=anomalyScore,
-                                           multiStepBestPredictions={})
+                                           multiStepBestPredictions=predictions)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
+    self.assertEqual(inferenceResult.multiStepBestPredictions, predictions)
     self.assertIsNone(inferenceResult.errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult))
     self.assertIn("anomalyScore", repr(inferenceResult))
+    self.assertIn("multiStepBestPredictions", repr(inferenceResult))
 
 
   def testModelInferenceResultConstructorWithErrorStatus(self):
@@ -364,6 +367,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertIsNone(inferenceResult.anomalyScore)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
     self.assertEqual(inferenceResult.errorMessage, errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("errorMsg", str(inferenceResult))
@@ -383,6 +387,21 @@ class ModelInferenceResultTestCase(unittest.TestCase):
                   cm.exception.args[0])
 
 
+  def testModelInferenceResultConstructorInvalidMultiStepBestPredictions(self):
+    rowID = 1
+    status = 0
+    anomalyScore = 0.5
+    multiStepBestPrediction = 1.0
+
+    with self.assertRaises(AssertionError) as cm:
+      ModelInferenceResult(rowID=rowID, status=status,
+                           anomalyScore=anomalyScore,
+                           multiStepBestPredictions=multiStepBestPrediction)
+    self.assertIn(("Expected dict multi-step best predictions with status=0, "
+                   "but got"),
+                  cm.exception.args[0])
+
+
   def testModelInferenceResultConstructorMissingErrorMessage(self):
     rowID = 1
     status = 1
@@ -398,12 +417,14 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     rowID = 1
     status = 0
     anomalyScore = 9.72
+    predictions = {1: 11}
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
                                            anomalyScore=anomalyScore,
-                                           multiStepBestPredictions={})
+                                           multiStepBestPredictions=predictions)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
+    self.assertEqual(inferenceResult.multiStepBestPredictions, predictions)
     self.assertIsNone(inferenceResult.errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult))
@@ -414,6 +435,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertEqual(inferenceResult2.rowID, rowID)
     self.assertEqual(inferenceResult2.status, status)
     self.assertEqual(inferenceResult2.anomalyScore, anomalyScore)
+    self.assertEqual(inferenceResult2.multiStepBestPredictions, predictions)
     self.assertIsNone(inferenceResult2.errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult2))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult2))
@@ -429,6 +451,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.errorMessage, errorMessage)
     self.assertIsNone(inferenceResult.anomalyScore)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult))
 
@@ -439,6 +462,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertEqual(inferenceResult2.status, status)
     self.assertEqual(inferenceResult2.errorMessage, errorMessage)
     self.assertIsNone(inferenceResult2.anomalyScore)
+    self.assertIsNone(inferenceResult2.multiStepBestPredictions)
     self.assertIn("ModelInferenceResult<", str(inferenceResult2))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult2))
 

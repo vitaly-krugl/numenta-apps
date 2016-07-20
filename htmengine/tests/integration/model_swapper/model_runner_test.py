@@ -208,6 +208,7 @@ class ModelRunnerIntTestCase(unittest.TestCase):
         self.assertEqual(result.status, htmengineerrno.SUCCESS)
         self.assertEqual(result.rowID, inputRow.rowID)
         self.assertIsInstance(result.anomalyScore, float)
+        self.assertIsInstance(result.multiStepBestPredictions, dict)
 
       # Verify model checkpoint
       model = checkpointMgr.load(modelID)
@@ -252,6 +253,7 @@ class ModelRunnerIntTestCase(unittest.TestCase):
         self.assertEqual(result.status, htmengineerrno.SUCCESS)
         self.assertEqual(result.rowID, inputRow.rowID)
         self.assertIsInstance(result.anomalyScore, float)
+        self.assertIsInstance(result.multiStepBestPredictions, dict)
 
       model = checkpointMgr.load(modelID)
       del model
@@ -302,6 +304,7 @@ class ModelRunnerIntTestCase(unittest.TestCase):
         self.assertEqual(result.status, htmengineerrno.SUCCESS)
         self.assertEqual(result.rowID, inputRow.rowID)
         self.assertIsInstance(result.anomalyScore, float)
+        self.assertIsInstance(result.multiStepBestPredictions, dict)
 
       model = checkpointMgr.load(modelID)
       del model
