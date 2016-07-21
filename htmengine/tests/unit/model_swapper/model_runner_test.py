@@ -642,7 +642,9 @@ class TestModelRunner(unittest.TestCase):
     inferenceArgs = "b"
     inputRecordSchema = [FieldMetaInfo("c1", "float", "")]
     anomalyScore1 = 1.111111
+    bestPredictions1 = {1: 1}
     anomalyScore2 = 2.222222
+    bestPredictions2 = {2: 2}
     dummyModelParams = dict(modelConfig=modelConfig,
                             inferenceArgs=inferenceArgs)
 
@@ -659,8 +661,10 @@ class TestModelRunner(unittest.TestCase):
     modelInstanceMock = Mock(
       run=Mock(
         side_effect=[
-          Mock(inferences=dict(anomalyScore=anomalyScore1)),
-          Mock(inferences=dict(anomalyScore=anomalyScore2))]))
+          Mock(inferences=dict(anomalyScore=anomalyScore1,
+                               multiStepBestPredictions=bestPredictions1)),
+          Mock(inferences=dict(anomalyScore=anomalyScore2,
+                               multiStepBestPredictions=bestPredictions2))]))
 
     modelFactoryClassMock.create.return_value = modelInstanceMock
 
@@ -716,10 +720,10 @@ class TestModelRunner(unittest.TestCase):
     expectedResults = [
       ModelInferenceResult(
         rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore1,
-        multiStepBestPredictions={}),
+        multiStepBestPredictions=bestPredictions1),
       ModelInferenceResult(
         rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore2,
-        multiStepBestPredictions={}),
+        multiStepBestPredictions=bestPredictions2),
     ]
 
     swapperMock.submitResults.assert_called_once_with(
@@ -735,13 +739,17 @@ class TestModelRunner(unittest.TestCase):
 
     inputRecordSchema = [FieldMetaInfo("c1", "float", "")]
     anomalyScore1 = 1.111111
+    bestPredictions1 = {1: 1}
     anomalyScore2 = 2.222222
+    bestPredictions2 = {2: 2}
 
     modelInstanceMock = Mock(
       run=Mock(
         side_effect=[
-          Mock(inferences=dict(anomalyScore=anomalyScore1)),
-          Mock(inferences=dict(anomalyScore=anomalyScore2))]))
+          Mock(inferences=dict(anomalyScore=anomalyScore1,
+                               multiStepBestPredictions=bestPredictions1)),
+          Mock(inferences=dict(anomalyScore=anomalyScore2,
+                               multiStepBestPredictions=bestPredictions2))]))
 
     checkpointMgrInstanceMock = modelCheckpointMgrClassMock.return_value
     checkpointMgrInstanceMock.loadCheckpointAttributes. \
@@ -809,10 +817,10 @@ class TestModelRunner(unittest.TestCase):
     expectedResults = [
       ModelInferenceResult(
         rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore1,
-        multiStepBestPredictions={}),
+        multiStepBestPredictions=bestPredictions1),
       ModelInferenceResult(
         rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore2,
-        multiStepBestPredictions={}),
+        multiStepBestPredictions=bestPredictions2),
     ]
 
     swapperMock.submitResults.assert_called_once_with(
@@ -835,7 +843,9 @@ class TestModelRunner(unittest.TestCase):
     modelInstanceMock = Mock(
       run=Mock(
         side_effect=[
-          Mock(inferences=dict(anomalyScore=score)) for score in anomalyScores
+          Mock(inferences=dict(anomalyScore=score,
+                               multiStepBestPredictions={score: score}))
+          for score in anomalyScores
         ]
       )
     )
@@ -907,7 +917,7 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions={score: score})
       for rowid, score in zip(
         [obj.rowID for obj in requestObjects], anomalyScores)
     ]
@@ -931,16 +941,24 @@ class TestModelRunner(unittest.TestCase):
     anomalyScore2 = 2.222222
     anomalyScore3 = 3.333333
     anomalyScore4 = 4.444444
+    bestPredictions1 = {1: 1}
+    bestPredictions2 = {2: 2}
+    bestPredictions3 = {3: 3}
+    bestPredictions4 = {4: 4}
 
     modelInstanceMock = Mock(
       run=Mock(
         side_effect=[
           # 2 results for catch-up from data samples in checkpoint
           # plus 2 more from new input rows
-          Mock(inferences=dict(anomalyScore=anomalyScore1)),
-          Mock(inferences=dict(anomalyScore=anomalyScore2)),
-          Mock(inferences=dict(anomalyScore=anomalyScore3)),
-          Mock(inferences=dict(anomalyScore=anomalyScore4))
+          Mock(inferences=dict(anomalyScore=anomalyScore1,
+                               multiStepBestPredictions=bestPredictions1)),
+          Mock(inferences=dict(anomalyScore=anomalyScore2,
+                               multiStepBestPredictions=bestPredictions2)),
+          Mock(inferences=dict(anomalyScore=anomalyScore3,
+                               multiStepBestPredictions=bestPredictions3)),
+          Mock(inferences=dict(anomalyScore=anomalyScore4,
+                               multiStepBestPredictions=bestPredictions4))
         ]
       )
     )
@@ -1023,10 +1041,10 @@ class TestModelRunner(unittest.TestCase):
     expectedResults = [
       ModelInferenceResult(
         rowID=requestObjects[0].rowID, status=0, anomalyScore=anomalyScore3,
-        multiStepBestPredictions={}),
+        multiStepBestPredictions=bestPredictions3),
       ModelInferenceResult(
         rowID=requestObjects[1].rowID, status=0, anomalyScore=anomalyScore4,
-        multiStepBestPredictions={}),
+        multiStepBestPredictions=bestPredictions4),
     ]
 
     swapperMock.submitResults.assert_called_once_with(
@@ -1051,7 +1069,9 @@ class TestModelRunner(unittest.TestCase):
     modelInstanceMock = Mock(
       run=Mock(
         side_effect=[
-          Mock(inferences=dict(anomalyScore=score)) for score in anomalyScores
+          Mock(inferences=dict(anomalyScore=score,
+                               multiStepBestPredictions={score: score}))
+          for score in anomalyScores
         ]
       )
     )
@@ -1134,7 +1154,7 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions={score: score})
       for rowid, score in zip(
         [obj.rowID for obj in requestObjects], anomalyScores[2:])
     ]

@@ -477,7 +477,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
-      multi_step_best_predictions={1:1},
+      multi_step_best_predictions={1: 1},
       display_value=0
     )
 
@@ -490,7 +490,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime2,
       raw_anomaly_score=0.5,
       anomaly_score=0.7,
-      multi_step_best_predictions={2:2},
+      multi_step_best_predictions={2: 2},
       display_value=2
     )
 
@@ -760,7 +760,7 @@ class InferenceResultTestCase(unittest.TestCase):
                   cm.exception.args[0])
 
 
-  def testRowIdMismatchInScrubInferernceResults(
+  def testRowIdMismatchInScrubInferenceResults(
       self, *_args):
     """Calling _scrubInferenceResultsAndInitMetricData with a rowID mismatch
     between an item in metricDataRows and inferenceResults should raise
@@ -797,7 +797,8 @@ class InferenceResultTestCase(unittest.TestCase):
           engine=engineMock,
           inferenceResults=[ModelInferenceResult(rowID=1, status=0,
                                                  anomalyScore=0,
-                                                 multiStepBestPredictions={})],
+                                                 multiStepBestPredictions={1: 1}
+                                                 )],
           metricDataRows=[metricRowDataMock],
           metricObj=metricRowMock)
 
@@ -805,7 +806,7 @@ class InferenceResultTestCase(unittest.TestCase):
                   cm.exception.args[0])
 
 
-  def testErrorResultAndActiveModelInScrubInferernceResults(
+  def testErrorResultAndActiveModelInScrubInferenceResults(
       self, repoMock, *_args):
     """Calling _scrubInferenceResultsAndInitMetricData with a failed inference
     result and ACTIVE model should set the model to ERROR state and raise
@@ -830,10 +831,12 @@ class InferenceResultTestCase(unittest.TestCase):
       metric_value = None
       timestamp = None
       raw_anomaly_score = None
+      multi_step_best_predictions = None
 
     metricRowDataMock = Mock(
         spec_set=MetricDataRowSpec,
-        uid=0, rowid=0, timestamp=None, metric_value=0, raw_anomaly_score=None)
+        uid=0, rowid=0, timestamp=None, metric_value=0, raw_anomaly_score=None,
+        multi_step_best_predictions=None)
 
     engineMock = Mock(spec_set=sqlalchemy.engine.Engine)
 
@@ -861,7 +864,7 @@ class InferenceResultTestCase(unittest.TestCase):
     self.assertIn("promoted to ERROR state", cm.exception.args[0])
 
 
-  def testErrorResultAndErrorModelInScrubInferernceResults(
+  def testErrorResultAndErrorModelInScrubInferenceResults(
       self, *_args):
     """Calling _scrubInferenceResultsAndInitMetricData with a failed inference
     result and errored out model should raise RejectedInferenceResultBatch
@@ -884,10 +887,12 @@ class InferenceResultTestCase(unittest.TestCase):
       metric_value = None
       timestamp = None
       raw_anomaly_score = None
+      multi_step_best_predictions = None
 
     metricRowDataMock = Mock(
         spec_set=MetricDataRowSpec,
-        uid=0, rowid=0, timestamp=None, metric_value=0)
+        uid=0, rowid=0, timestamp=None, metric_value=0,
+        multi_step_best_predictions=None)
 
     runner = anomaly_service.AnomalyService()
 

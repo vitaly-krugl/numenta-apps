@@ -525,9 +525,9 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions={}),
+                           multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions=dict())
       ]
     batchState = BatchPackager.marshal(batch=resultBatch)
     msg = ResultMessagePackager.marshal(modelID="foobar", batchState=batchState)
@@ -1036,9 +1036,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions={}),
+                           multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions=dict())
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1068,9 +1068,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions={}),
+                           multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions=dict())
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1106,9 +1106,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions={}),
+                           multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions=dict())
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1148,9 +1148,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3,
-                           multiStepBestPredictions={}),
+                           multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9,
-                           multiStepBestPredictions={})
+                           multiStepBestPredictions=dict())
     )
     modelID = "foobar"
     msg = ResultMessagePackager.marshal(

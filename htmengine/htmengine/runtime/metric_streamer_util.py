@@ -261,7 +261,7 @@ class MetricStreamer(object):
       """
       with repository.engineFactory(config).connect() as conn:
         with conn.begin():
-          # Syncrhonize with adapter's monitorMetric
+          # Synchronize with adapter's monitorMetric
           metricObj = repository.getMetricWithUpdateLock(
             conn,
             metricID,
