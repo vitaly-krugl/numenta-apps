@@ -34,8 +34,8 @@ from collections import namedtuple
 import datetime
 import json
 import logging
-import pkg_resources
 import unittest
+import pkg_resources
 
 from mock import patch, MagicMock, Mock
 import sqlalchemy
@@ -341,16 +341,16 @@ class CommandResultTestCase(unittest.TestCase):
     class MetricRowSpec(object):
       status = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.CREATE_PENDING)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.CREATE_PENDING)
     repoMock.getMetric.return_value = metricRowMock
 
     runner = anomaly_service.AnomalyService()
 
     metricID = "abc"
     result = anomaly_service.ModelCommandResult(
-      commandID="123", method="defineModel", status=htmengineerrno.ERR_INVALID_ARG,
+      commandID="123", method="defineModel",
+      status=htmengineerrno.ERR_INVALID_ARG,
       errorMessage="invalid arg")
 
     runner._processModelCommandResult(metricID=metricID, result=result)
@@ -371,16 +371,15 @@ class CommandResultTestCase(unittest.TestCase):
     class MetricRowSpec(object):
       status = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ERROR)
+    metricRowMock = Mock(spec_set=MetricRowSpec, status=MetricStatus.ERROR)
     repoMock.getMetricWithSharedLock.return_value = metricRowMock
 
     runner = anomaly_service.AnomalyService()
 
     metricID = "abc"
     result = anomaly_service.ModelCommandResult(
-      commandID="123", method="defineModel", status=htmengineerrno.ERR_INVALID_ARG,
+      commandID="123", method="defineModel",
+      status=htmengineerrno.ERR_INVALID_ARG,
       errorMessage="invalid arg")
 
     runner._processModelCommandResult(metricID=metricID, result=result)
@@ -579,10 +578,9 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.UNMONITORED,
-        parameters=None)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.UNMONITORED,
+                         parameters=None)
     repoMock.getMetric.return_value = metricRowMock
 
     runner = anomaly_service.AnomalyService()
@@ -606,18 +604,16 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ACTIVE,
-        parameters=None)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.ACTIVE,
+                         parameters=None)
     repoMock.getMetric.return_value = metricRowMock
 
     class MetricDataRowSpec(object):
       uid = None
       rowid = Mock()
 
-    metricRowDataMock = Mock(
-        spec_set=MetricDataRowSpec)
+    metricRowDataMock = Mock(spec_set=MetricDataRowSpec)
     repoMock.getMetricData.return_value = [metricRowDataMock]
 
     runner = anomaly_service.AnomalyService()
@@ -675,10 +671,9 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.UNMONITORED,
-        parameters=None)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.UNMONITORED,
+                         parameters=None)
     repoMock.getMetric.return_value = metricRowMock
     updateAnomalyLikelihoodParamsMock.side_effect = (
       app_exceptions.MetricNotActiveError("faking it"))
@@ -712,10 +707,9 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.UNMONITORED,
-        parameters=None)
+    metricRowMock = Mock(spec_set=MetricRowSpec,
+                         status=MetricStatus.UNMONITORED,
+                         parameters=None)
 
     engineMock = Mock(spec_set=sqlalchemy.engine.Engine)
 
@@ -723,8 +717,8 @@ class InferenceResultTestCase(unittest.TestCase):
 
     with self.assertRaises(anomaly_service.RejectedInferenceResultBatch) as cm:
       runner._scrubInferenceResultsAndInitMetricData(
-          engine=engineMock, inferenceResults=[], metricDataRows=[Mock()],
-          metricObj=metricRowMock)
+        engine=engineMock, inferenceResults=[], metricDataRows=[Mock()],
+        metricObj=metricRowMock)
 
     self.assertIn("Truncated inference result batch", cm.exception.args[0])
 
@@ -743,9 +737,9 @@ class InferenceResultTestCase(unittest.TestCase):
       server = None
 
     metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.UNMONITORED,
-        parameters=None)
+      spec_set=MetricRowSpec,
+      status=MetricStatus.UNMONITORED,
+      parameters=None)
 
     engineMock = Mock(spec_set=sqlalchemy.engine.Engine)
 
@@ -753,8 +747,8 @@ class InferenceResultTestCase(unittest.TestCase):
 
     with self.assertRaises(anomaly_service.RejectedInferenceResultBatch) as cm:
       runner._scrubInferenceResultsAndInitMetricData(
-          engine=engineMock, inferenceResults=[Mock()], metricDataRows=[],
-          metricObj=metricRowMock)
+        engine=engineMock, inferenceResults=[Mock()], metricDataRows=[],
+        metricObj=metricRowMock)
 
     self.assertIn("No MetricData row for inference result",
                   cm.exception.args[0])
@@ -773,10 +767,8 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ACTIVE,
-        parameters=None)
+    metricRowMock = Mock(spec_set=MetricRowSpec, status=MetricStatus.ACTIVE,
+                         parameters=None)
 
     class MetricDataRowSpec(object):
       uid = None
@@ -784,9 +776,8 @@ class InferenceResultTestCase(unittest.TestCase):
       metric_value = None
       timestamp = None
 
-    metricRowDataMock = Mock(
-        spec_set=MetricDataRowSpec,
-        uid=0, rowid=0, timestamp=None, metric_value=0)
+    metricRowDataMock = Mock(spec_set=MetricDataRowSpec, uid=0, rowid=0,
+                             timestamp=None, metric_value=0)
 
     engineMock = Mock(spec_set=sqlalchemy.engine.Engine)
 
@@ -794,13 +785,13 @@ class InferenceResultTestCase(unittest.TestCase):
 
     with self.assertRaises(anomaly_service.RejectedInferenceResultBatch) as cm:
       runner._scrubInferenceResultsAndInitMetricData(
-          engine=engineMock,
-          inferenceResults=[ModelInferenceResult(rowID=1, status=0,
-                                                 anomalyScore=0,
-                                                 multiStepBestPredictions={1: 1}
-                                                 )],
-          metricDataRows=[metricRowDataMock],
-          metricObj=metricRowMock)
+        engine=engineMock,
+        inferenceResults=[ModelInferenceResult(rowID=1, status=0,
+                                               anomalyScore=0,
+                                               multiStepBestPredictions={1: 1}
+                                              )],
+        metricDataRows=[metricRowDataMock],
+        metricObj=metricRowMock)
 
     self.assertIn("RowID mismatch between inference result",
                   cm.exception.args[0])
@@ -819,11 +810,8 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ACTIVE,
-        parameters=None,
-        uid=0)
+    metricRowMock = Mock(spec_set=MetricRowSpec, status=MetricStatus.ACTIVE,
+                         parameters=None, uid=0)
 
     class MetricDataRowSpec(object):
       uid = None
@@ -833,10 +821,10 @@ class InferenceResultTestCase(unittest.TestCase):
       raw_anomaly_score = None
       multi_step_best_predictions = None
 
-    metricRowDataMock = Mock(
-        spec_set=MetricDataRowSpec,
-        uid=0, rowid=0, timestamp=None, metric_value=0, raw_anomaly_score=None,
-        multi_step_best_predictions=None)
+    metricRowDataMock = Mock(spec_set=MetricDataRowSpec, uid=0, rowid=0,
+                             timestamp=None, metric_value=0,
+                             raw_anomaly_score=None,
+                             multi_step_best_predictions=None)
 
     engineMock = Mock(spec_set=sqlalchemy.engine.Engine)
 
@@ -852,15 +840,15 @@ class InferenceResultTestCase(unittest.TestCase):
 
     with self.assertRaises(anomaly_service.RejectedInferenceResultBatch) as cm:
       runner._scrubInferenceResultsAndInitMetricData(
-          engine=engineMock,
-          inferenceResults=[ModelInferenceResult(rowID=0,
-                                                 status=MetricStatus.ERROR,
-                                                 errorMessage="bad inference")],
-          metricDataRows=[metricRowDataMock],
-          metricObj=metricRowMock)
+        engine=engineMock,
+        inferenceResults=[ModelInferenceResult(rowID=0,
+                                               status=MetricStatus.ERROR,
+                                               errorMessage="bad inference")],
+        metricDataRows=[metricRowDataMock],
+        metricObj=metricRowMock)
 
-    repoMock.setMetricStatus.assert_called_with(
-        connMock, 0, MetricStatus.ERROR, "bad inference")
+    repoMock.setMetricStatus.assert_called_with(connMock, 0, MetricStatus.ERROR,
+                                                "bad inference")
     self.assertIn("promoted to ERROR state", cm.exception.args[0])
 
 
@@ -876,10 +864,8 @@ class InferenceResultTestCase(unittest.TestCase):
       parameters = None
       server = None
 
-    metricRowMock = Mock(
-        spec_set=MetricRowSpec,
-        status=MetricStatus.ERROR,
-        parameters=None)
+    metricRowMock = Mock(spec_set=MetricRowSpec, status=MetricStatus.ERROR,
+                         parameters=None)
 
     class MetricDataRowSpec(object):
       uid = None
@@ -889,10 +875,9 @@ class InferenceResultTestCase(unittest.TestCase):
       raw_anomaly_score = None
       multi_step_best_predictions = None
 
-    metricRowDataMock = Mock(
-        spec_set=MetricDataRowSpec,
-        uid=0, rowid=0, timestamp=None, metric_value=0,
-        multi_step_best_predictions=None)
+    metricRowDataMock = Mock(spec_set=MetricDataRowSpec, uid=0, rowid=0,
+                             timestamp=None, metric_value=0,
+                             multi_step_best_predictions=None)
 
     runner = anomaly_service.AnomalyService()
 
@@ -925,11 +910,11 @@ class UpdateAnomalyLikelihoodParamsTestCase(unittest.TestCase):
       # for repository.getMetricWithUpdateLock:
       Mock(spec_set=sqlalchemy.engine.ResultProxy,
            first=Mock(
-            spec_set=sqlalchemy.engine.ResultProxy.first,
-            side_effect=[
-              Mock(
-                spec_set=MetricDataRowSpec,
-                status=MetricStatus.ACTIVE)])),
+             spec_set=sqlalchemy.engine.ResultProxy.first,
+             side_effect=[
+               Mock(
+                 spec_set=MetricDataRowSpec,
+                 status=MetricStatus.ACTIVE)])),
 
       # for repository.updateMetricColumns:
       Mock(spec_set=sqlalchemy.engine.ResultProxy)
@@ -950,8 +935,8 @@ class UpdateAnomalyLikelihoodParamsTestCase(unittest.TestCase):
       repositoryWrap.updateMetricColumns.call_args[0])
     self.assertEqual(
       fieldsArg,
-      {"model_params":
-        json.dumps({"anomalyLikelihoodParams": "likelihood-state"})})
+      {"model_params": json.dumps({"anomalyLikelihoodParams":
+                                   "likelihood-state"})})
 
 
 if __name__ == '__main__':

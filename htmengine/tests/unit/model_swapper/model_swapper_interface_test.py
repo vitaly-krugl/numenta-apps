@@ -27,7 +27,6 @@ Unit tests for the model_swapper_interface classes
 import copy
 import datetime
 import json
-import os
 import unittest
 import uuid
 
@@ -363,7 +362,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     status = 1
     errorMessage = "something bad"
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      errorMessage=errorMessage)
+                                           errorMessage=errorMessage)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertIsNone(inferenceResult.anomalyScore)
@@ -408,7 +407,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     errorMessage = None
     with self.assertRaises(AssertionError) as cm:
       ModelInferenceResult(rowID=rowID, status=status,
-        errorMessage=errorMessage)
+                           errorMessage=errorMessage)
     self.assertIn("Unexpected errorMessage type with non-zero status",
                   cm.exception.args[0])
 
@@ -446,7 +445,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     status = 1
     errorMessage = "error"
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      errorMessage=errorMessage)
+                                           errorMessage=errorMessage)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.errorMessage, errorMessage)
@@ -475,11 +474,11 @@ class BatchPackagerTestCase(unittest.TestCase):
 
   def testMarshalUnmarshal(self):
     inputBatch = [
-        ModelCommandResult(commandID="commandID", method="testMethod", status=1,
-          errorMessage="errorMessage"),
-        ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
-        ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
-      ]
+      ModelCommandResult(commandID="commandID", method="testMethod", status=1,
+                         errorMessage="errorMessage"),
+      ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
+      ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
+    ]
     batchState = BatchPackager.marshal(batch=inputBatch)
 
     requestBatch = BatchPackager.unmarshal(batchState=batchState)
@@ -496,11 +495,11 @@ class RequestMessagePackagerTestCase(unittest.TestCase):
 
   def testMarshalAndUnmarshal(self):
     requestBatch = [
-        ModelCommand(commandID="abc", method="defineModel",
-          args={'key1': 4098, 'key2': 4139}),
-        ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
-        ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
-      ]
+      ModelCommand(commandID="abc", method="defineModel",
+                   args={'key1': 4098, 'key2': 4139}),
+      ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
+      ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
+    ]
     batchState = BatchPackager.marshal(batch=requestBatch)
     msg = RequestMessagePackager.marshal(batchID="foobar",
                                          batchState=batchState)
@@ -523,7 +522,7 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
   def testMarshalAndUnmarshal(self):
     resultBatch = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
+                         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
                            multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
@@ -578,17 +577,17 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     modelInputQPrefix = self.__class__.__name__ + ".MODEL_INPUT_QUEUE_PREFIX"
 
     with ConfigAttributePatch(
-        modelSwapperConfig.CONFIG_NAME,
-        modelSwapperConfig.baseConfigDir,
-        ((ModelSwapperInterface._CONFIG_SECTION,
-          ModelSwapperInterface._SCHEDULER_NOTIFICATION_Q_OPTION_NAME,
-          notificationQName),
-         (ModelSwapperInterface._CONFIG_SECTION,
-          ModelSwapperInterface._RESULTS_Q_OPTION_NAME,
-          resultsQName),
-         (ModelSwapperInterface._CONFIG_SECTION,
-          ModelSwapperInterface._MODEL_INPUT_Q_PREFIX_OPTION_NAME,
-          modelInputQPrefix))):
+      modelSwapperConfig.CONFIG_NAME,
+      modelSwapperConfig.baseConfigDir,
+      ((ModelSwapperInterface._CONFIG_SECTION,
+        ModelSwapperInterface._SCHEDULER_NOTIFICATION_Q_OPTION_NAME,
+        notificationQName),
+       (ModelSwapperInterface._CONFIG_SECTION,
+        ModelSwapperInterface._RESULTS_Q_OPTION_NAME,
+        resultsQName),
+       (ModelSwapperInterface._CONFIG_SECTION,
+        ModelSwapperInterface._MODEL_INPUT_Q_PREFIX_OPTION_NAME,
+        modelInputQPrefix))):
 
       swapperAPI = ModelSwapperInterface()
 
@@ -604,7 +603,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testSubmitRequestsWithContextManager(self, messageBusConnectorClassMock):
     requests = [
       ModelCommand(commandID="abc", method="defineModel",
-        args={'key1': 4098, 'key2': 4139}),
+                   args={'key1': 4098, 'key2': 4139}),
       ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
       ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"])
     ]
@@ -641,7 +640,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       self, messageBusConnectorClassMock):
     requests = [
       ModelCommand(commandID="abc", method="defineModel",
-        args={'key1': 4098, 'key2': 4139}),
+                   args={'key1': 4098, 'key2': 4139}),
       ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
       ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"])
     ]
@@ -675,7 +674,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # notification message queue is created at startup of model scheduler
     requests = [
       ModelCommand(commandID="abc", method="defineModel",
-        args={'key1': 4098, 'key2': 4139}),
+                   args={'key1': 4098, 'key2': 4139}),
       ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
       ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"])
     ]
@@ -875,7 +874,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # Configure mocks
 
     exception = message_bus_connector.MessageQueueNotFound(
-                  "publish failed in mock test")
+      "publish failed in mock test")
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
     messageBusConnectorMock.purge.side_effect = exception
@@ -898,7 +897,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # Configure mocks
 
     exception = message_bus_connector.MessageQueueNotFound(
-                  "publish failed in mock test")
+      "publish failed in mock test")
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
     messageBusConnectorMock.publish.side_effect = exception
@@ -965,7 +964,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     model_swapper_interface, "MessageBusConnector", autospec=True,
     isEmpty=Mock(spec_set=MessageBusConnector.isEmpty))
   def testModelInputPendingMessageQueueNotFoundInterpretedAsNo(
-    self, messageBusConnectorClassMock):
+      self, messageBusConnectorClassMock):
     modelID = "model_foo"
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1034,7 +1033,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testSubmitResults(self, messageBusConnectorClassMock):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
+                         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
                            multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
@@ -1066,7 +1065,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # the results message queue and re-publishing the message
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
+                         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
                            multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
@@ -1104,7 +1103,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testSubmitResultsFailure(self, messageBusConnectorClassMock):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
+                         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
                            multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
@@ -1146,7 +1145,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testContextManagerAndConsumeResults(self, messageBusConnectorClassMock):
     expectedResults = (
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
+                         args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3,
                            multiStepBestPredictions=dict()),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9,

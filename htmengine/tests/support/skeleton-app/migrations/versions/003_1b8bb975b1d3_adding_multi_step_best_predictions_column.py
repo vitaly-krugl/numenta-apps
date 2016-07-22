@@ -37,12 +37,12 @@ down_revision = '1d2eddc43366'
 
 
 def upgrade():
-    """ Adds column 'multi_step_best_predictions' to metric_data table """
-    op.add_column('metric_data',
-                  sa.Column('multi_step_best_predictions', sa.TEXT(),
-                            nullable=True))
-    ### end Alembic commands ###
+  """ Adds column 'multi_step_best_predictions' to metric_data table """
+  op.add_column('metric_data',
+                sa.Column('multi_step_best_predictions', sa.TEXT(),
+                          nullable=True))
+  ### end Alembic commands ###
 
 
 def downgrade():
-    raise NotImplementedError("Rollback is not supported.")
+  raise NotImplementedError("Rollback is not supported.")

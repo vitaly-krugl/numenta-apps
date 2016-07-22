@@ -25,9 +25,9 @@
 import datetime
 import json
 import os
-import pkg_resources
 import unittest
 import uuid
+import pkg_resources
 
 from htmengine import repository
 import htmengine.adapters.datasource as datasource_adapter_factory

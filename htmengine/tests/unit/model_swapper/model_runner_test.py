@@ -28,7 +28,6 @@ import base64
 import cPickle
 import datetime
 import logging
-import os
 import select
 import threading
 import unittest
@@ -38,9 +37,6 @@ from mock import Mock, patch
 
 
 from nupic.data.fieldmeta import FieldMetaInfo
-
-from nta.utils.test_utils.config_test_utils import ConfigAttributePatch
-
 
 from htmengine.model_checkpoint_mgr import model_checkpoint_mgr
 from htmengine.model_swapper import model_runner
@@ -52,10 +48,8 @@ from htmengine.model_swapper.model_swapper_interface import (
   ModelInputRow,
   ModelInferenceResult)
 from htmengine import htmengineerrno
-
-
-
 from nta.utils.logging_support_raw import LoggingSupport
+from nta.utils.test_utils.config_test_utils import ConfigAttributePatch
 
 
 
@@ -166,9 +160,9 @@ class TestModelRunner(unittest.TestCase):
     checkpointMgrInstanceMock = modelCheckpointMgrClassMock.return_value
     checkpointMgrInstanceMock.loadCheckpointAttributes. \
       return_value = (
-      {
-        model_runner._ModelArchiver._BATCH_IDS_CHECKPOINT_ATTR_NAME:
-          ["1", "2", "3"]})
+        {
+          model_runner._ModelArchiver._BATCH_IDS_CHECKPOINT_ATTR_NAME:
+            ["1", "2", "3"]})
     checkpointMgrInstanceMock.loadModelDefinition.side_effect = (
       model_checkpoint_mgr.ModelNotFound("Model not found"))
 
@@ -729,9 +723,8 @@ class TestModelRunner(unittest.TestCase):
     swapperMock.submitResults.assert_called_once_with(
       modelID=modelID, results=expectedResults)
 
-
-  def testLoadFromFullAndSaveIncremental(
-    self, modelCheckpointMgrClassMock, modelSwapperInterfaceClassMock):
+  def testLoadFromFullAndSaveIncremental(self, modelCheckpointMgrClassMock,
+                                         modelSwapperInterfaceClassMock):
     # Test ModelRunner's inference-processing plumbing by sending
     # input rows with mocking of input stream, output, and model
     # access logic.
@@ -754,9 +747,9 @@ class TestModelRunner(unittest.TestCase):
     checkpointMgrInstanceMock = modelCheckpointMgrClassMock.return_value
     checkpointMgrInstanceMock.loadCheckpointAttributes. \
       return_value = (
-      {
-        model_runner._ModelArchiver._BATCH_IDS_CHECKPOINT_ATTR_NAME:
-          ["1", "2", "3"]})
+        {
+          model_runner._ModelArchiver._BATCH_IDS_CHECKPOINT_ATTR_NAME:
+            ["1", "2", "3"]})
     checkpointMgrInstanceMock.loadModelDefinition.return_value = (
       dict(inputSchema=inputRecordSchema))
     checkpointMgrInstanceMock.load.return_value = modelInstanceMock
@@ -1175,11 +1168,11 @@ class TestModelRunner(unittest.TestCase):
       side_effect = model_checkpoint_mgr.ModelNotFound
 
     requestsPerCheckpoint = 10
-    with ConfigAttributePatch(
-        modelSwapperConfig.CONFIG_NAME,
-        modelSwapperConfig.baseConfigDir,
-        (("model_runner", "target_requests_per_checkpoint",
-          str(requestsPerCheckpoint)),)):
+    with ConfigAttributePatch(modelSwapperConfig.CONFIG_NAME,
+                              modelSwapperConfig.baseConfigDir,
+                              (("model_runner",
+                                "target_requests_per_checkpoint",
+                                str(requestsPerCheckpoint)),)):
       modelID = "abc"
       modelConfig = "a"
       inferenceArgs = "b"
@@ -1258,11 +1251,11 @@ class TestModelRunner(unittest.TestCase):
     # exactly-once-execution
 
     requestsPerCheckpoint = 10
-    with ConfigAttributePatch(
-        modelSwapperConfig.CONFIG_NAME,
-        modelSwapperConfig.baseConfigDir,
-        (("model_runner", "target_requests_per_checkpoint",
-          str(requestsPerCheckpoint)),)):
+    with ConfigAttributePatch(modelSwapperConfig.CONFIG_NAME,
+                              modelSwapperConfig.baseConfigDir,
+                              (("model_runner",
+                                "target_requests_per_checkpoint",
+                                str(requestsPerCheckpoint)),)):
       modelID = "abc"
       modelConfig = "a"
       inferenceArgs = "b"
@@ -1341,8 +1334,8 @@ class TestModelRunner(unittest.TestCase):
       self.assertEqual(swapperMock.submitResults.call_count, len(requests) // 2)
 
 
-  def testInferencePathWithModelNotFound(
-    self, modelCheckpointMgrClassMock, modelSwapperInterfaceClassMock):
+  def testInferencePathWithModelNotFound(self, modelCheckpointMgrClassMock,
+                                         modelSwapperInterfaceClassMock):
     # Test ModelRunner's inference-processing error plumbing by sending input
     # rows for a model that hasn't been defined, with mocking of input stream,
     # output, and model access logic.
@@ -1407,8 +1400,8 @@ class TestModelRunner(unittest.TestCase):
     self.assertIn("Inference failed", outputResults[1].errorMessage)
 
 
-  def testInferencePathWithGenericError(
-    self, modelCheckpointMgrClassMock, modelSwapperInterfaceClassMock):
+  def testInferencePathWithGenericError(self, modelCheckpointMgrClassMock,
+                                        modelSwapperInterfaceClassMock):
     # Test ModelRunner's inference-processing error plumbing by sending input
     # rows and simulating a generic Exception, with mocking of input stream,
     # output, and model access logic.

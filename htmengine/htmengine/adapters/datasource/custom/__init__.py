@@ -77,8 +77,8 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
 
     self.connectionFactory = connectionFactory
 
-    self._includeMultiStepBestPredictions = config.getboolean("global",
-      "multiStepBestPredictions")
+    self._includeMultiStepBestPredictions = config.getboolean(
+      "global", "multiStepBestPredictions")
 
   @repository.retryOnTransientErrors
   def createMetric(self, metricName):
@@ -325,8 +325,8 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
       stats = {"min": minVal, "max": maxVal, "minResolution": minResolution}
       self._log.debug("monitorMetric: metric=%s, stats=%r", metricId, stats)
 
-      swarmParams = scalar_metric_utils.generateSwarmParams(stats,
-        self._includeMultiStepBestPredictions)
+      swarmParams = scalar_metric_utils.generateSwarmParams(
+        stats, self._includeMultiStepBestPredictions)
 
     self._startMonitoringWithRetries(metricId, modelSpec, swarmParams)
 
@@ -418,8 +418,8 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
 
     stats = self._getMetricStatistics(metricId)
 
-    swarmParams = scalar_metric_utils.generateSwarmParams(stats,
-      self._includeMultiStepBestPredictions)
+    swarmParams = scalar_metric_utils.generateSwarmParams(
+      stats, self._includeMultiStepBestPredictions)
 
     scalar_metric_utils.startModel(metricId,
                                    swarmParams=swarmParams,

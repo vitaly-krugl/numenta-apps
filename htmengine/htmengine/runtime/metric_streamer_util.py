@@ -98,7 +98,7 @@ class MetricStreamer(object):
     for sample in data:
       timestamp, metricValue = sample
       # Filter out those whose timestamp is not newer than previous sampale's
-      if (prevSampleTimestamp is not None and timestamp < prevSampleTimestamp):
+      if prevSampleTimestamp is not None and timestamp < prevSampleTimestamp:
         # Reject it; this could be the result of an unordered sample feed or
         # concurrent feeds of samples for the same metric
         # TODO: unit-test

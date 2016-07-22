@@ -375,7 +375,7 @@ class ModelRunner(object):
       return ModelCommandResult(
         commandID=command.commandID, method=command.method,
         status=(e.errno if isinstance(e, _ModelRunnerError) else
-          htmengineerrno.ERR),
+                htmengineerrno.ERR),
         errorMessage="%s - %r failed on modelID=%s: %s. (tb: ...%s)" % (
           datetime.utcnow().isoformat(), command, self._modelID,
           str(e) or repr(e),
@@ -516,13 +516,15 @@ class ModelRunner(object):
 
     except (Exception, _ModelRunnerError) as e:  # pylint: disable=W0703
       self._logger.exception("%r: Inference failed for row=%r", self, row)
-      return ModelInferenceResult(rowID=row.rowID,
+      return ModelInferenceResult(
+        rowID=row.rowID,
         status=(e.errno if isinstance(e, _ModelRunnerError) else
-          htmengineerrno.ERR),
+                htmengineerrno.ERR),
         errorMessage="%s - Inference failed for rowID=%s of modelID=%s (%r): "
-          "(tb: ...%s)" % (datetime.utcnow().isoformat(),
-                           row.rowID, self._modelID, e,
-                           traceback.format_exc()[-self._MAX_TRACEBACK_TAIL:]))
+                     "(tb: ...%s)" % (
+                       datetime.utcnow().isoformat(),
+                       row.rowID, self._modelID, e,
+                       traceback.format_exc()[-self._MAX_TRACEBACK_TAIL:]))
 
 
   def _loadModel(self):

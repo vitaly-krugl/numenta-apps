@@ -405,9 +405,9 @@ class ModelInferenceResult(_ModelRequestResultBase):
         "Expected numeric anomaly score with status=0, but got: " +
         repr(anomalyScore))
       assert (multiStepBestPredictions is None or
-              isinstance(multiStepBestPredictions, dict)), (
-        "Expected dict multi-step best predictions with status=0, but got: " +
-        repr(multiStepBestPredictions))
+              isinstance(multiStepBestPredictions, dict)), \
+        ("Expected dict multi-step best predictions with status=0, but got: " +
+         repr(multiStepBestPredictions))
       assert errorMessage is None, (
         "Unexpected errorMessage with status=0: " + repr(errorMessage))
     else:
