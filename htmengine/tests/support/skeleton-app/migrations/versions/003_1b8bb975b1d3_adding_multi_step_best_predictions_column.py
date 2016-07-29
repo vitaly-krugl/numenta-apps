@@ -32,7 +32,7 @@ import sqlalchemy as sa
 
 # Revision identifiers, used by Alembic. Do not change.
 revision = '1b8bb975b1d3'
-down_revision = '1d2eddc43366'
+down_revision = '872a895b8e8'
 
 
 
