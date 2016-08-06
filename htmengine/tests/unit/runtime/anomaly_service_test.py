@@ -30,6 +30,7 @@ Unit tests for htmengine.runtime.anomaly_service
 # Disable: Method could be a function
 # pylint: disable=R0201
 
+import collections
 from collections import namedtuple
 import datetime
 import json
@@ -550,7 +551,7 @@ class InferenceResultTestCase(unittest.TestCase):
       self.assertEqual(resultRow["rawAnomaly"], inputRow.raw_anomaly_score)
       self.assertEqual(resultRow["anomaly"], inputRow.anomaly_score)
       self.assertEqual(resultRow["multiStepBestPredictions"],
-                       json.dumps(inputRow.multi_step_best_predictions))
+                       inputRow.multi_step_best_predictions)
 
     for resultRow, inputRow in zip(resultRows, dataRows):
       validateResultRow(resultRow, inputRow)
@@ -563,7 +564,31 @@ class InferenceResultTestCase(unittest.TestCase):
     deserializedMsg = anomaly_service.AnomalyService.deserializeModelResult(
       serializedMsg)
     self.maxDiff = None
+
+    self.assertIn("results", deserializedMsg)
+
+    # convert multiStepBestPredictions string keys to ints
+    for result in deserializedMsg["results"]:
+      self.assertIn("multiStepBestPredictions", result)
+      multiStepBestPredictions = result["multiStepBestPredictions"]
+      key = "1" if "1" in multiStepBestPredictions else "2"
+      multiStepBestPredictions[int(key)] = multiStepBestPredictions[key]
+      del multiStepBestPredictions[key]
+
+    deserializedMsg = self.dictValuesToUnicode(deserializedMsg)
+    msg = self.dictValuesToUnicode(msg)
     self.assertEqual(deserializedMsg, msg)
+
+
+  def dictValuesToUnicode(self, data):
+    if isinstance(data, basestring):
+      return unicode(data)
+    elif isinstance(data, collections.Mapping):
+      return dict(map(self.dictValuesToUnicode, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+      return type(data)(map(self.dictValuesToUnicode, data))
+    else:
+      return data
 
 
   def testRejectionOfInferenceResultsForInactiveMetric(

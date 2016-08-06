@@ -123,6 +123,9 @@ class ModelSwapperE2ETestCase(unittest.TestCase):
                                                        minVal=0,
                                                        maxVal=1000)
 
+      # Classifier must be enabled to obtain predicted values
+      args["modelConfig"]["modelParams"]["clEnable"] = True
+
       # Submit requests including a model creation command and two data rows.
       args["inputRecordSchema"] = (
         FieldMetaInfo("c0", FieldMetaType.datetime,

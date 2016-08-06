@@ -382,19 +382,26 @@ class ModelInferenceResult(_ModelRequestResultBase):
   def __init__(self, rowID, status, anomalyScore=None,
                multiStepBestPredictions=None,
                errorMessage=None):
-    """ __init__(rowID, status, anomalyScore) or
-        __init__(rowID, status, anomalyScore, multiStepBestPredictions) or
-        __init__(rowID, status, errorMessage)
+    """ A model inference result instance must fall under one of two use cases:
+    1) It encapsulates a standard result in which case it contains an anomaly
+    score and/or multistep best predictions. Additionally, the error message
+    should be None.
+    2) It wraps an error that occurred while processing the result, and both
+    the anomaly score and the multistep best predictions should be None.
 
     :param rowID: rowID id of the corresponding input record
     :param status: integer; 0 (zero) means success, otherwise it's an error code
       from htmengine.htmengineerno
     :param anomalyScore: the Anomaly Score floating point value if status is 0
       (zero), omit otherwise
-    :param multiStepBestPredictions: best model predictions according to the
-     associated classifier; key is the number of steps in the future for which
-     the prediction is made
-    :type multiStepBestPredictions: dict
+    :param multiStepBestPredictions: The best model predictions according to the
+     model's associated classifier. If the classifier is not enabled
+     the value is None. Otherwise, a dict of predicted value(s) stored by key(s)
+     equal to the number of steps in the future for which the prediction is
+     made. The temporal anomaly model default steps is [1], that is,
+     prediction for 1 step in the future, however, user-specified model params
+     can specify differently. (See also nupic.frameworks.opf.clamodel.CLAModel)
+    :type multiStepBestPredictions: dict or None
     :param errorMessage: error message if status is non-zero, omit otherwise
     """
     assert isinstance(status, (int, long)), (
@@ -406,8 +413,8 @@ class ModelInferenceResult(_ModelRequestResultBase):
         repr(anomalyScore))
       assert (multiStepBestPredictions is None or
               isinstance(multiStepBestPredictions, dict)), \
-        ("Expected dict multi-step best predictions with status=0, but got: " +
-         repr(multiStepBestPredictions))
+        ("Expected None or dict multi-step best predictions with status=0, but "
+         "got: " + repr(multiStepBestPredictions))
       assert errorMessage is None, (
         "Unexpected errorMessage with status=0: " + repr(errorMessage))
     else:

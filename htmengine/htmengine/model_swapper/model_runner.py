@@ -191,7 +191,7 @@ class ModelRunner(object):
         lastRequestBatch = None
 
         with self._swapperAPI.consumeRequests(
-          modelID=self._modelID, blocking=False) as consumer:
+            modelID=self._modelID, blocking=False) as consumer:
 
           if self._profiling:
             batchStartTime = time.time()
@@ -511,8 +511,7 @@ class ModelRunner(object):
         rowID=row.rowID,
         status=0,
         anomalyScore=r.inferences["anomalyScore"],
-        multiStepBestPredictions=r.inferences.get("multiStepBestPredictions",
-                                                  dict()))
+        multiStepBestPredictions=r.inferences.get("multiStepBestPredictions"))
 
     except (Exception, _ModelRunnerError) as e:  # pylint: disable=W0703
       self._logger.exception("%r: Inference failed for row=%r", self, row)

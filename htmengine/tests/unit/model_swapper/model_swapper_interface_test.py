@@ -396,8 +396,8 @@ class ModelInferenceResultTestCase(unittest.TestCase):
       ModelInferenceResult(rowID=rowID, status=status,
                            anomalyScore=anomalyScore,
                            multiStepBestPredictions=multiStepBestPrediction)
-    self.assertIn(("Expected dict multi-step best predictions with status=0, "
-                   "but got"),
+    self.assertIn(("Expected None or dict multi-step best predictions with "
+                   "status=0, but got"),
                   cm.exception.args[0])
 
 

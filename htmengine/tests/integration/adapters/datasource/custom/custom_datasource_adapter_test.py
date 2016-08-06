@@ -722,10 +722,9 @@ class CustomDatasourceAdapterTest(TestCaseBase):
     # Turn on monitoring
     modelSpec = {
       "datasource": "custom",
-
       "metricSpec": {
         "metric": metricName
-      },
+      }
     }
 
     adapter.monitorMetric(modelSpec)
