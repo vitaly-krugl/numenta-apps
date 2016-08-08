@@ -21,9 +21,9 @@
 
 """Adds multi-step-best-predictions column to metric data.
 
-Revision ID: 59c9ef218d3f
-Revises: 3b26d099594d
-Create Date: 2016-08-08 11:50:27.101733
+Revision ID: 2695f59d78bd
+Revises: a60d03066072
+Create Date: 2016-08-08 13:28:15.851769
 """
 
 from alembic import op
@@ -31,8 +31,8 @@ import sqlalchemy as sa
 
 
 # Revision identifiers, used by Alembic. Do not change.
-revision = '59c9ef218d3f'
-down_revision = '3b26d099594d'
+revision = '2695f59d78bd'
+down_revision = 'a60d03066072'
 
 
 
