@@ -34,7 +34,6 @@ RUN apt-get update && \
                        libssl-dev
 
 # Copy taurus_metric_collectors-relevant numenta-apps subdirs to image
-COPY infrastructure /opt/numenta/infrastructure
 COPY nta.utils /opt/numenta/nta.utils
 COPY htmengine /opt/numenta/htmengine
 COPY taurus_metric_collectors /opt/numenta/taurus_metric_collectors

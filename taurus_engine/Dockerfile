@@ -36,7 +36,6 @@ RUN apt-get update && \
 
 
 # Copy taurus-relevant numenta-apps subdirs to image
-COPY infrastructure /opt/numenta/infrastructure
 COPY nta.utils /opt/numenta/nta.utils
 COPY htmengine /opt/numenta/htmengine
 COPY taurus_engine /opt/numenta/taurus_engine
