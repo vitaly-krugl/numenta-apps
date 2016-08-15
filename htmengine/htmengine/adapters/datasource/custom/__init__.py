@@ -54,7 +54,7 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
 
   # Default metric period value to use when it's unknown
   # TODO: Should we use 0 since it's unknown "unknown" or default to 5 min?
-  #   Consider potential impact on web charts, htm-it-mobile
+  #   Consider potential impact on web charts
   _DEFAULT_METRIC_PERIOD = 300  # 300 sec = 5 min
 
 

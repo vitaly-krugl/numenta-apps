@@ -263,7 +263,7 @@ export default class Chart extends React.Component {
   }
 
   _yScaleUpdate() {
-    let paddingPx = 2;
+    let paddingPx = 3;
     let height = this._styles.root.height - RANGE_SELECTOR_HEIGHT - 3;
     let range = [height - paddingPx, paddingPx];
 
@@ -294,6 +294,16 @@ export default class Chart extends React.Component {
       } else if (v2 || v2 === 0) {
         yExtentVisible[0] = Math.min(yExtentVisible[0], v2);
         yExtentVisible[1] = Math.max(yExtentVisible[1], v2);
+      }
+    }
+
+    if (yExtentVisible[0] === yExtentVisible[1]) {
+      // The y scale needs to have a min that's not equal to the max.
+      if (yExtentVisible[0] === 0) {
+        yExtentVisible[1] = 1;
+      } else {
+        yExtentVisible[0] *= 0.9;
+        yExtentVisible[1] *= 1.1;
       }
     }
 
@@ -826,7 +836,8 @@ export default class Chart extends React.Component {
       valueRange: this._yScale.domain(),
       axisLineColor: muiTheme.rawTheme.palette.accent4Color,
       connectSeparatedPoints: true,  // required for raw+agg overlay
-      highlightCircleSize: 0,
+      highlightCircleSize: 3, // also configures the 'point between gaps' size
+      drawHighlightPointCallback: () => {}, // disable highlight points
       interactionModel: {}, // we handle all of the interaction
       showLabelsOnHighlight: false,
       labelsDiv: document.createElement('div'), // put its labels into the abyss

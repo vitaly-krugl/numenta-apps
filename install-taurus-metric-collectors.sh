@@ -35,5 +35,4 @@ function install {
 }
 
 install nta.utils $1
-install infrastructure $1
 install taurus_metric_collectors $1
