@@ -30,6 +30,10 @@
         "minResolution": {
           "required": false,
           "type": "number"
+        },
+        "enableClassifier": {
+          "required": false,
+          "type": "boolean"
         }
       }
     },

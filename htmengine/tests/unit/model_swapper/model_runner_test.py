@@ -837,7 +837,7 @@ class TestModelRunner(unittest.TestCase):
       run=Mock(
         side_effect=[
           Mock(inferences=dict(anomalyScore=score,
-                               multiStepBestPredictions={score: score}))
+                               multiStepBestPredictions={1: score}))
           for score in anomalyScores
         ]
       )
@@ -910,7 +910,7 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score,
-                           multiStepBestPredictions={score: score})
+                           multiStepBestPredictions={1: score})
       for rowid, score in zip(
         [obj.rowID for obj in requestObjects], anomalyScores)
     ]
@@ -935,9 +935,9 @@ class TestModelRunner(unittest.TestCase):
     anomalyScore3 = 3.333333
     anomalyScore4 = 4.444444
     bestPredictions1 = {1: 1}
-    bestPredictions2 = {2: 2}
-    bestPredictions3 = {3: 3}
-    bestPredictions4 = {4: 4}
+    bestPredictions2 = {1: 2}
+    bestPredictions3 = {1: 3}
+    bestPredictions4 = {1: 4}
 
     modelInstanceMock = Mock(
       run=Mock(
@@ -1063,7 +1063,7 @@ class TestModelRunner(unittest.TestCase):
       run=Mock(
         side_effect=[
           Mock(inferences=dict(anomalyScore=score,
-                               multiStepBestPredictions={score: score}))
+                               multiStepBestPredictions={1: score}))
           for score in anomalyScores
         ]
       )
@@ -1147,7 +1147,7 @@ class TestModelRunner(unittest.TestCase):
     requestObjects = requests[0].objects
     expectedResults = [
       ModelInferenceResult(rowID=rowid, status=0, anomalyScore=score,
-                           multiStepBestPredictions={score: score})
+                           multiStepBestPredictions={1: score})
       for rowid, score in zip(
         [obj.rowID for obj in requestObjects], anomalyScores[2:])
     ]
@@ -1178,6 +1178,7 @@ class TestModelRunner(unittest.TestCase):
       inferenceArgs = "b"
       inputRecordSchema = [FieldMetaInfo("c1", "float", "")]
       anomalyScore1 = 1.111111
+      bestPredictions1 = {1: 1}
       dummyModelParams = dict(modelConfig=modelConfig,
                               inferenceArgs=inferenceArgs)
 
@@ -1190,7 +1191,8 @@ class TestModelRunner(unittest.TestCase):
 
       # Configure ModelFactory mock
       modelInstanceMock = Mock(run=Mock(
-        return_value=Mock(inferences=dict(anomalyScore=anomalyScore1))))
+        return_value=Mock(inferences=dict(anomalyScore=anomalyScore1,
+                                          bestPredictions=bestPredictions1))))
 
       modelFactoryClassMock.create.return_value = modelInstanceMock
 
@@ -1261,6 +1263,7 @@ class TestModelRunner(unittest.TestCase):
       inferenceArgs = "b"
       inputRecordSchema = [FieldMetaInfo("c1", "float", "")]
       anomalyScore1 = 1.111111
+      bestPredictions1 = {1: 1}
       dummyModelParams = dict(modelConfig=modelConfig,
                               inferenceArgs=inferenceArgs)
 
@@ -1282,7 +1285,8 @@ class TestModelRunner(unittest.TestCase):
 
       # Configure ModelFactory mock
       modelInstanceMock = Mock(run=Mock(
-        return_value=Mock(inferences=dict(anomalyScore=anomalyScore1))))
+        return_value=Mock(inferences=dict(anomalyScore=anomalyScore1,
+                                          bestPredictions=bestPredictions1))))
 
       modelFactoryClassMock.create.return_value = modelInstanceMock
 

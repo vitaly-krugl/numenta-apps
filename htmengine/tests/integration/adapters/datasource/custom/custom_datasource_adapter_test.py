@@ -389,16 +389,78 @@ class CustomDatasourceAdapterTest(TestCaseBase):
       metricObj = repository.getMetric(conn,
                                        metricId,
                                        fields=[schema.metric.c.status,
-                                               schema.metric.c.parameters])
+                                               schema.metric.c.parameters,
+                                               schema.metric.c.model_params])
     self.assertIn(metricObj.status, (MetricStatus.CREATE_PENDING,
                                      MetricStatus.ACTIVE))
     self.assertEqual(json.loads(metricObj.parameters), modelSpec)
+
+    self._assertClassifierStatusInModelParams(metricObj.model_params,
+                                              classifierEnabled=False)
 
     self._validateModelSpec(json.loads(metricObj.parameters))
 
     g_log.info("Waiting for model to become active")
     self.checkModelIsActive(metricId)
     self.checkEncoderResolution(metricId, 0, 100)
+
+
+  def testMonitorMetricClassifierEnabled(self):
+    """ Test monitorMetric with request for enabled classifier in model
+    params """
+    metricName = "test-" + uuid.uuid1().hex
+
+    adapter = datasource_adapter_factory.createCustomDatasourceAdapter()
+
+    g_log.info("Creating htmengine custom metric; name=%s", metricName)
+    metricId = adapter.createMetric(metricName)
+    self.addCleanup(adapter.deleteMetricByName, metricName)
+
+    # Turn on monitoring
+    modelSpec = {
+      "datasource": "custom",
+
+      "metricSpec": {
+        "metric": metricName
+      },
+
+      "modelParams": {
+        "min": 0,  # optional
+        "max": 100,  # optional
+        "enableClassifier": True
+      }
+    }
+
+    adapter.monitorMetric(modelSpec)
+
+    with self.engine.connect() as conn:
+      metricObj = repository.getMetric(conn,
+                                       metricId,
+                                       fields=[schema.metric.c.status,
+                                               schema.metric.c.parameters,
+                                               schema.metric.c.model_params])
+    self.assertEqual(metricObj.status, MetricStatus.CREATE_PENDING)
+    self.assertEqual(json.loads(metricObj.parameters), modelSpec)
+
+    self._assertClassifierStatusInModelParams(metricObj.model_params,
+                                              classifierEnabled=True)
+
+    self._validateModelSpec(json.loads(metricObj.parameters))
+
+    g_log.info("Waiting for model to become active")
+    self.checkModelIsActive(metricId)
+    self.checkEncoderResolution(metricId, 0, 100)
+
+
+  def _assertClassifierStatusInModelParams(self, model_params,
+                                           classifierEnabled):
+    self.assertIsNotNone(model_params)
+    modelParams = json.loads(model_params)
+    self.assertIn("modelConfig", modelParams)
+    self.assertIn("modelParams", modelParams["modelConfig"])
+    self.assertIn("clEnable", modelParams["modelConfig"]["modelParams"])
+    self.assertEquals(modelParams["modelConfig"]["modelParams"]["clEnable"],
+                      classifierEnabled)
 
 
   @staticmethod
@@ -749,9 +811,71 @@ class CustomDatasourceAdapterTest(TestCaseBase):
     with self.engine.connect() as conn:
       metricObj = repository.getMetric(conn,
                                        metricId,
-                                       fields=[schema.metric.c.status])
+                                       fields=[schema.metric.c.status,
+                                               schema.metric.c.model_params])
     self.assertIn(metricObj.status, (MetricStatus.CREATE_PENDING,
                                      MetricStatus.ACTIVE))
+
+    self._assertClassifierStatusInModelParams(metricObj.model_params,
+                                              classifierEnabled=False)
+
+    g_log.info("Waiting for model to become active")
+    self.checkModelIsActive(metricId)
+
+    g_log.info("Waiting at least one model result")
+    self.checkModelResultsSize(metricId, 1, atLeast=True)
+
+
+  def testActivateModelClassifierEnabled(self):
+    """ Test activateModel with classifier enabled in model spec. """
+    metricName = "test-" + uuid.uuid1().hex
+
+    adapter = datasource_adapter_factory.createCustomDatasourceAdapter()
+
+    g_log.info("Creating htmengine custom metric; name=%s", metricName)
+    metricId = adapter.createMetric(metricName)
+    self.addCleanup(adapter.deleteMetricByName, metricName)
+
+    # Turn on monitoring
+    modelSpec = {
+      "datasource": "custom",
+      "metricSpec": {
+        "metric": metricName
+      },
+      "modelParams": {
+        "enableClassifier": True
+      }
+    }
+
+    adapter.monitorMetric(modelSpec)
+
+    with self.engine.connect() as conn:
+      metricObj = repository.getMetric(conn,
+                                       metricId,
+                                       fields=[schema.metric.c.status])
+    self.assertEqual(metricObj.status, MetricStatus.PENDING_DATA)
+
+    # Add some data
+    data = [
+      (0, datetime.datetime.utcnow() - datetime.timedelta(minutes=5)),
+      (100, datetime.datetime.utcnow())
+    ]
+    with self.engine.connect() as conn:
+      repository.addMetricData(conn, metricId, data)
+
+    # Activate model
+    adapter.activateModel(metricId)
+
+    with self.engine.connect() as conn:
+      metricObj = repository.getMetric(conn,
+                                       metricId,
+                                       fields=[schema.metric.c.status,
+                                               schema.metric.c.model_params])
+    self.assertIn(metricObj.status, (MetricStatus.CREATE_PENDING,
+                                     MetricStatus.ACTIVE))
+
+    self._assertClassifierStatusInModelParams(metricObj.model_params,
+                                              classifierEnabled=True)
 
     g_log.info("Waiting for model to become active")
     self.checkModelIsActive(metricId)
