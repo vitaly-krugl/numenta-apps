@@ -380,14 +380,13 @@ class ModelInferenceResult(_ModelRequestResultBase):
 
 
   def __init__(self, rowID, status, anomalyScore=None,
-               multiStepBestPredictions=None,
-               errorMessage=None):
+               multiStepBestPredictions=None, errorMessage=None):
     """ A model inference result instance must fall under one of two use cases:
     1) It encapsulates a standard result in which case it contains an anomaly
-    score and/or multistep best predictions. Additionally, the error message
+    score and/or multi-step best predictions. Additionally, the error message
     should be None.
     2) It wraps an error that occurred while processing the result, and both
-    the anomaly score and the multistep best predictions should be None.
+    the anomaly score and multi-step best predictions should be None.
 
     :param rowID: rowID id of the corresponding input record
     :param status: integer; 0 (zero) means success, otherwise it's an error code

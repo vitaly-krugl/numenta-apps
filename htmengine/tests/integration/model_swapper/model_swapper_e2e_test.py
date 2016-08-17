@@ -106,10 +106,19 @@ class ModelSwapperE2ETestCase(unittest.TestCase):
     return batches
 
 
+  def testModelSwapperClassifierEnabled(self):
+    """ Simple end-to-end test of the model swapper system with classifier
+    enabled. """
+    self._auxTestModelSwapper(classifierEnabled=True)
 
-  def testModelSwapper(self):
-    """Simple end-to-end test of the model swapper system."""
 
+  def testModelSwapperClassifierDisabled(self):
+    """ Simple end-to-end test of the model swapper system with classifier
+    disabled. """
+    self._auxTestModelSwapper(classifierEnabled=False)
+
+
+  def _auxTestModelSwapper(self, classifierEnabled):
     modelSchedulerSubprocess = self._startModelSchedulerSubprocess()
     self.addCleanup(lambda: modelSchedulerSubprocess.kill()
                     if modelSchedulerSubprocess.returncode is None
@@ -124,7 +133,7 @@ class ModelSwapperE2ETestCase(unittest.TestCase):
                                                        maxVal=1000)
 
       # Classifier must be enabled to obtain predicted values
-      args["modelConfig"]["modelParams"]["clEnable"] = True
+      args["modelConfig"]["modelParams"]["clEnable"] = classifierEnabled
 
       # Submit requests including a model creation command and two data rows.
       args["inputRecordSchema"] = (
@@ -172,7 +181,6 @@ class ModelSwapperE2ETestCase(unittest.TestCase):
         # The results message queue should be empty now
         self.assertTrue(bus.isEmpty(swapperAPI._resultsQueueName))
 
-
       # Delete the model
       _LOGGER.info("Deleting the model")
       swapperAPI.deleteModel(modelID=modelID, commandID="deleteModelCmd1")
@@ -195,57 +203,52 @@ class ModelSwapperE2ETestCase(unittest.TestCase):
       _LOGGER.info("Attempting to delete the model again")
       swapperAPI.deleteModel(modelID=modelID, commandID="deleteModelCmd1")
 
-
     # Verify results
-
     # First result batch should be the first defineModel result
     batch = resultBatches[0]
     self.assertEqual(batch.modelID, modelID)
     self.assertEqual(len(batch.objects), 1)
-
     result = batch.objects[0]
     self.assertIsInstance(result, ModelCommandResult)
     self.assertEqual(result.method, "defineModel")
     self.assertEqual(result.status, htmengineerrno.SUCCESS)
     self.assertEqual(result.commandID, "defineModelCmd1")
-
     # The second result batch should for the second defineModel result for the
     # same model
     batch = resultBatches[1]
     self.assertEqual(batch.modelID, modelID)
     self.assertEqual(len(batch.objects), 1)
-
     result = batch.objects[0]
     self.assertIsInstance(result, ModelCommandResult)
     self.assertEqual(result.method, "defineModel")
     self.assertEqual(result.status, htmengineerrno.SUCCESS)
     self.assertEqual(result.commandID, "defineModelCmd2")
-
     # The third batch should be for the two input rows
     batch = resultBatches[2]
     self.assertEqual(batch.modelID, modelID)
     self.assertEqual(len(batch.objects), len(inputRows))
-
     for inputRow, result in zip(inputRows, batch.objects):
       self.assertIsInstance(result, ModelInferenceResult)
       self.assertEqual(result.status, htmengineerrno.SUCCESS)
       self.assertEqual(result.rowID, inputRow.rowID)
       self.assertIsInstance(result.anomalyScore, float)
-      self.assertIsInstance(result.multiStepBestPredictions, dict)
+      if classifierEnabled:
+        self.assertIsInstance(result.multiStepBestPredictions, dict)
+      else:
+        self.assertIsNone(result.multiStepBestPredictions)
 
     # The fourth batch should be for the "deleteModel"
     batch = resultBatches[3]
     self.assertEqual(batch.modelID, modelID)
     self.assertEqual(len(batch.objects), 1)
-
     result = batch.objects[0]
     self.assertIsInstance(result, ModelCommandResult)
     self.assertEqual(result.method, "deleteModel")
     self.assertEqual(result.status, htmengineerrno.SUCCESS)
     self.assertEqual(result.commandID, "deleteModelCmd1")
-
     # Signal Model Scheduler Service subprocess to shut down and wait for it
     waitResult = dict()
+
     def runWaiterThread():
       try:
         waitResult["returnCode"] = modelSchedulerSubprocess.wait()
@@ -261,9 +264,7 @@ class ModelSwapperE2ETestCase(unittest.TestCase):
     waiterThread.start()
     waiterThread.join(timeout=30)
     self.assertFalse(waiterThread.isAlive())
-
     self.assertEqual(waitResult["returnCode"], 0, msg=repr(waitResult))
-
 
   @unittest.skip("MER-1499")
   def testCloneModel(self):

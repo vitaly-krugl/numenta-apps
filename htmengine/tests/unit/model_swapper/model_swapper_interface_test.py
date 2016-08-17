@@ -357,6 +357,24 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertIn("multiStepBestPredictions", repr(inferenceResult))
 
 
+  def testModelInferenceResultConstructorWithNoneBestPredictions(self):
+    rowID = 1
+    status = 0
+    anomalyScore = 1.95
+    inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
+                                           anomalyScore=anomalyScore,
+                                           multiStepBestPredictions=None)
+    self.assertEqual(inferenceResult.rowID, rowID)
+    self.assertEqual(inferenceResult.status, status)
+    self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
+    self.assertIsNone(inferenceResult.errorMessage)
+    self.assertIn("ModelInferenceResult<", str(inferenceResult))
+    self.assertIn("ModelInferenceResult<", repr(inferenceResult))
+    self.assertIn("anomalyScore", repr(inferenceResult))
+    self.assertIn("multiStepBestPredictions", repr(inferenceResult))
+
+
   def testModelInferenceResultConstructorWithErrorStatus(self):
     rowID = 1
     status = 1
@@ -412,11 +430,18 @@ class ModelInferenceResultTestCase(unittest.TestCase):
                   cm.exception.args[0])
 
 
-  def testModelInferenceResultSerializableStateWithAnomalyScore(self):
+  def testModelInferenceResultSerializableStateWithAnomalyScoreWithPreds(self):
+    self._auxTestModelInfResSerializStateAnomScore(predictions={1: 1})
+
+
+  def testModelInferenceResultSerializableStateWithAnomalyScoreNoPreds(self):
+    self._auxTestModelInfResSerializStateAnomScore(predictions=None)
+
+
+  def _auxTestModelInfResSerializStateAnomScore(self, predictions):
     rowID = 1
     status = 0
     anomalyScore = 9.72
-    predictions = {1: 11}
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
                                            anomalyScore=anomalyScore,
                                            multiStepBestPredictions=predictions)
@@ -427,10 +452,8 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertIsNone(inferenceResult.errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult))
-
     inferenceResult2 = _ModelRequestResultBase.__createFromState__(
       inferenceResult.__getstate__())
-
     self.assertEqual(inferenceResult2.rowID, rowID)
     self.assertEqual(inferenceResult2.status, status)
     self.assertEqual(inferenceResult2.anomalyScore, anomalyScore)
@@ -524,9 +547,9 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
                          args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions=dict()),
+                           multiStepBestPredictions=None),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions=dict())
+                           multiStepBestPredictions={1: 2})
       ]
     batchState = BatchPackager.marshal(batch=resultBatch)
     msg = ResultMessagePackager.marshal(modelID="foobar", batchState=batchState)
@@ -535,7 +558,6 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
 
     self.assertEqual(r.modelID, "foobar")
     self.assertEqual(r.batchState, batchState)
-
 
     # Make sure we aren't forgetting to test any returned fields
     self.assertEqual(set(["modelID", "batchState"]), set(r._fields))
@@ -1035,9 +1057,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
                          args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions=dict()),
+                           multiStepBestPredictions={1: 1}),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions=dict())
+                           multiStepBestPredictions=None)
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1067,9 +1089,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
                          args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions=dict()),
+                           multiStepBestPredictions=None),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions=dict())
+                           multiStepBestPredictions={1: 2})
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1105,9 +1127,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
                          args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
-                           multiStepBestPredictions=dict()),
+                           multiStepBestPredictions={1: 1}),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
-                           multiStepBestPredictions=dict())
+                           multiStepBestPredictions=None)
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1147,9 +1169,9 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
                          args={'key1': 4098, 'key2': 4139}),
       ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3,
-                           multiStepBestPredictions=dict()),
+                           multiStepBestPredictions={"1": 1}),
       ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9,
-                           multiStepBestPredictions=dict())
+                           multiStepBestPredictions={"1": 2})
     )
     modelID = "foobar"
     msg = ResultMessagePackager.marshal(

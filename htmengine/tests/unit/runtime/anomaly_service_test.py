@@ -189,9 +189,8 @@ class CommandResultTestCase(unittest.TestCase):
       commandID="123", method="defineModel", status=0)
 
     with self.assertRaises(app_exceptions.MetricNotMonitoredError):
-      msg = service._composeModelCommandResultMessage(modelID=modelID,
-                                                      cmdResult=result)
-
+      service._composeModelCommandResultMessage(modelID=modelID,
+                                                cmdResult=result)
 
 
   def testComposeModelCommandResultForDelete(self, repoMock, *_args):
@@ -405,7 +404,7 @@ class InferenceResultTestCase(unittest.TestCase):
     batch = model_swapper_interface._ConsumedResultBatch(
       modelID="abcdef",
       objects=[ModelInferenceResult(rowID=1, status=0, anomalyScore=0,
-                                    multiStepBestPredictions={1:1})],
+                                    multiStepBestPredictions={1: 1})],
       ack=Mock(spec_set=(lambda multiple: None))
     )
 
@@ -450,7 +449,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime1,
       raw_anomaly_score=0.1,
       anomaly_score=0,
-      multi_step_best_predictions={1:1},
+      multi_step_best_predictions={1: 1},
       display_value=0
     )
     metricDataRows=[metricDataRow]
@@ -490,7 +489,7 @@ class InferenceResultTestCase(unittest.TestCase):
       timestamp=tsDatetime2,
       raw_anomaly_score=0.5,
       anomaly_score=0.7,
-      multi_step_best_predictions={2: 2},
+      multi_step_best_predictions=None,
       display_value=2
     )
 
@@ -524,9 +523,9 @@ class InferenceResultTestCase(unittest.TestCase):
       dataRows=dataRows)
 
     # Verify message against schema
-    with pkg_resources.resource_stream(
-        "htmengine.runtime.json_schema",
-        "model_inference_results_msg_schema.json") as msgSchemaStream:
+    with pkg_resources.resource_stream("htmengine.runtime.json_schema",
+                                       ("model_inference_results_msg_schema"
+                                        ".json")) as msgSchemaStream:
       validictory.validate(msg, json.load(msgSchemaStream))
 
     # Verify message properties
@@ -571,9 +570,10 @@ class InferenceResultTestCase(unittest.TestCase):
     for result in deserializedMsg["results"]:
       self.assertIn("multiStepBestPredictions", result)
       multiStepBestPredictions = result["multiStepBestPredictions"]
-      key = "1" if "1" in multiStepBestPredictions else "2"
-      multiStepBestPredictions[int(key)] = multiStepBestPredictions[key]
-      del multiStepBestPredictions[key]
+      if multiStepBestPredictions:
+        self.assertIn("1", multiStepBestPredictions)
+        multiStepBestPredictions[1] = multiStepBestPredictions["1"]
+        del multiStepBestPredictions["1"]
 
     deserializedMsg = self.dictValuesToUnicode(deserializedMsg)
     msg = self.dictValuesToUnicode(msg)

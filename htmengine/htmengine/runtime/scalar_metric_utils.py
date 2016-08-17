@@ -82,10 +82,11 @@ def generateSwarmParams(stats, classifierEnabled=False):
 
   :param stats: dict with "min", "max" and optional "minResolution"; values must
     be integer, float or None.
-  :param classifierEnabled: A Boolean value given to the model parameter's
-    'clEnable' property. As the classifier generates multistep best predictions,
-    setting this value to True will allow multistep best predictions to be
-    populated in the metric_data table for the associated metric of the model.
+  :param classifierEnabled: A Boolean value to be given to the 'clEnable'
+    property of 'modelParams'. As the classifier generates multi-step best
+    predictions, setting this value to True will allow multi-step best
+    predictions to be populated in the metric_data table for the associated
+    metric of the model.
 
   :returns: if either minVal or maxVal is None, returns None; otherwise returns
     swarmParams object that is suitable for passing to startMonitoring and

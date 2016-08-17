@@ -638,7 +638,7 @@ class TestModelRunner(unittest.TestCase):
     anomalyScore1 = 1.111111
     bestPredictions1 = {1: 1}
     anomalyScore2 = 2.222222
-    bestPredictions2 = {2: 2}
+    bestPredictions2 = None
     dummyModelParams = dict(modelConfig=modelConfig,
                             inferenceArgs=inferenceArgs)
 
@@ -732,9 +732,9 @@ class TestModelRunner(unittest.TestCase):
 
     inputRecordSchema = [FieldMetaInfo("c1", "float", "")]
     anomalyScore1 = 1.111111
-    bestPredictions1 = {1: 1}
+    bestPredictions1 = None
     anomalyScore2 = 2.222222
-    bestPredictions2 = {2: 2}
+    bestPredictions2 = {1: 2}
 
     modelInstanceMock = Mock(
       run=Mock(
@@ -935,7 +935,7 @@ class TestModelRunner(unittest.TestCase):
     anomalyScore3 = 3.333333
     anomalyScore4 = 4.444444
     bestPredictions1 = {1: 1}
-    bestPredictions2 = {1: 2}
+    bestPredictions2 = None
     bestPredictions3 = {1: 3}
     bestPredictions4 = {1: 4}
 

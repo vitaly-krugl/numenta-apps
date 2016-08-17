@@ -452,15 +452,15 @@ class CustomDatasourceAdapterTest(TestCaseBase):
     self.checkEncoderResolution(metricId, 0, 100)
 
 
-  def _assertClassifierStatusInModelParams(self, model_params,
+  def _assertClassifierStatusInModelParams(self, modelParams,
                                            classifierEnabled):
-    self.assertIsNotNone(model_params)
-    modelParams = json.loads(model_params)
+    self.assertIsNotNone(modelParams)
+    modelParams = json.loads(modelParams)
     self.assertIn("modelConfig", modelParams)
     self.assertIn("modelParams", modelParams["modelConfig"])
     self.assertIn("clEnable", modelParams["modelConfig"]["modelParams"])
-    self.assertEquals(modelParams["modelConfig"]["modelParams"]["clEnable"],
-                      classifierEnabled)
+    self.assertEquals(classifierEnabled,
+                      modelParams["modelConfig"]["modelParams"]["clEnable"])
 
 
   @staticmethod
