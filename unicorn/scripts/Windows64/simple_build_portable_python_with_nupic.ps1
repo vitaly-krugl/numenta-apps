@@ -16,7 +16,7 @@ $python_msi_url = "https://www.python.org/ftp/python/$python_version/python-$pyt
 $python_msi = "python-$python_version.amd64.msi"
 
 # Pip
-$get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
+$get_pip_url = "http://releases.numenta.org/pip/1ebd3cb7a5a3073058d0c9552ab074bd/get-pip.py"
 $get_pip = "get-pip.py"
 
 Write-Host "==> Uninstalling Python ..."
