@@ -412,16 +412,10 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
     stats = self._getMetricStatistics(metricId)
 
     enableClassifier = False
-    if metricObj.parameters:
-      try:
-        metricParameters = json.loads(metricObj.parameters)
-        if "modelParams" in metricParameters:
-          enableClassifier = metricParameters["modelParams"].get(
-            "enableClassifier", False)
-      except ValueError:
-        self._log.warning("Failed to load JSON from metric parameters=%s for "
-                          "metricId=%s. Model will be created without "
-                          "classifier", metricObj.parameters, metricId)
+    metricParameters = json.loads(metricObj.parameters)
+    if "modelParams" in metricParameters:
+      enableClassifier = metricParameters["modelParams"].get("enableClassifier",
+                                                             False)
 
     swarmParams = scalar_metric_utils.generateSwarmParams(stats,
                                                           enableClassifier)

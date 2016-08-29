@@ -373,14 +373,14 @@ class ModelInferenceResult(_ModelRequestResultBase):
   """ Model inference result container """
 
   # NOTE: also used by serialization/deserialization in our base class
-  __slots__ = ("rowID", "status", "anomalyScore", "multiStepBestPredictions",
-               "errorMessage")
+  __slots__ = ("rowID", "status", "anomalyScore", "errorMessage",
+               "multiStepBestPredictions")
 
-  __STATE_SIGNATURE__ = "iR"
+  __STATE_SIGNATURE__ = "iRv2"
 
 
-  def __init__(self, rowID, status, anomalyScore=None,
-               multiStepBestPredictions=None, errorMessage=None):
+  def __init__(self, rowID, status, errorMessage=None, anomalyScore=None,
+               multiStepBestPredictions=None):
     """ A model inference result instance must fall under one of two use cases:
     1) It encapsulates a standard result in which case it contains an anomaly
     score and/or multi-step best predictions. Additionally, the error message
@@ -394,12 +394,14 @@ class ModelInferenceResult(_ModelRequestResultBase):
     :param anomalyScore: the Anomaly Score floating point value if status is 0
       (zero), omit otherwise
     :param multiStepBestPredictions: The best model predictions according to the
-     model's associated classifier. If the classifier is not enabled
-     the value is None. Otherwise, a dict of predicted value(s) stored by key(s)
-     equal to the number of steps in the future for which the prediction is
-     made. The temporal anomaly model default steps is [1], that is,
-     prediction for 1 step in the future, however, user-specified model params
-     can specify differently. (See also nupic.frameworks.opf.clamodel.CLAModel)
+     model's associated classifier. If the classifier is not enabled the value
+     here will be None. Otherwise, the value will be a dict of predicted
+     value(s) stored by key(s) equal to the number of steps in the future for
+     which the prediction is made. (See nupic.frameworks.opf.clamodel.CLAModel).
+     The default number of steps for temporal anomaly models is 1, that is, a
+     prediction for 1 step in the future, however user-specified model params
+     can dictate a different number of steps. See 'completeModelParams' property
+     of htmengine/adapters/datasource/model_spec_schema.json for details.
     :type multiStepBestPredictions: dict or None
     :param errorMessage: error message if status is non-zero, omit otherwise
     """
@@ -442,6 +444,22 @@ class ModelInferenceResult(_ModelRequestResultBase):
 
     return "%s<rowID=%s, status=%s%s>" % (self.__class__.__name__, self.rowID,
                                           self.status, reprBody)
+
+
+
+@_ModelRequestResultBase.__register__
+class ModelInferenceResultLegacyV1(ModelInferenceResult):
+  """ Legacy model inference result lacking multi-step best predictions. """
+
+  __STATE_SIGNATURE__ = "iR"
+
+  def __setstate__(self, state):
+    # Convert STATE_SIGNATURE
+    self.__STATE_SIGNATURE__ = ModelInferenceResult.__STATE_SIGNATURE__
+
+    # Convert STATE_SIGNATURE and append None for multiStepBestPredictions value
+    super(ModelInferenceResultLegacyV1, self).__setstate__(
+      [ModelInferenceResult.__STATE_SIGNATURE__] + state[1:] + [None])
 
 
 

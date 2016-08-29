@@ -523,9 +523,9 @@ class InferenceResultTestCase(unittest.TestCase):
       dataRows=dataRows)
 
     # Verify message against schema
-    with pkg_resources.resource_stream("htmengine.runtime.json_schema",
-                                       ("model_inference_results_msg_schema"
-                                        ".json")) as msgSchemaStream:
+    with pkg_resources.resource_stream(
+        "htmengine.runtime.json_schema",
+        "model_inference_results_msg_schema.json") as msgSchemaStream:
       validictory.validate(msg, json.load(msgSchemaStream))
 
     # Verify message properties
@@ -962,6 +962,63 @@ class UpdateAnomalyLikelihoodParamsTestCase(unittest.TestCase):
       fieldsArg,
       {"model_params": json.dumps({"anomalyLikelihoodParams":
                                    "likelihood-state"})})
+
+
+class MutableMetricDataRowTestCase(unittest.TestCase):
+
+  def testMutableMetricDataRowRepr(self):
+    uid = "abcdef"
+    rowid = 1
+    metric_value = 10.9
+    tsDatetime1 = datetime.datetime(2015, 4, 17, 12, 3, 35)
+    raw_anomaly_score = 0.1
+    anomaly_score = 0
+    predictions = {1: 1}
+    display_value = 0
+
+    inferenceResult1 = anomaly_service.MutableMetricDataRow(
+      uid=uid,
+      rowid=rowid,
+      metric_value=metric_value,
+      timestamp=tsDatetime1,
+      raw_anomaly_score=raw_anomaly_score,
+      anomaly_score=anomaly_score,
+      multi_step_best_predictions=predictions,
+      display_value=display_value
+    )
+
+    self.assertEqual(inferenceResult1.uid, uid)
+    self.assertEqual(inferenceResult1.rowid, rowid)
+    self.assertEqual(inferenceResult1.timestamp, tsDatetime1)
+    self.assertEqual(inferenceResult1.raw_anomaly_score, raw_anomaly_score)
+    self.assertEqual(inferenceResult1.anomaly_score, anomaly_score)
+    self.assertEqual(inferenceResult1.multi_step_best_predictions, predictions)
+    self.assertEqual(inferenceResult1.display_value, display_value)
+
+    self.assertIn("MutableMetricDataRow<", repr(inferenceResult1))
+    self.assertIn("uid", repr(inferenceResult1))
+    self.assertIn("rowid", repr(inferenceResult1))
+    self.assertIn("ts", repr(inferenceResult1))
+    self.assertIn("value", repr(inferenceResult1))
+    self.assertIn("raw", repr(inferenceResult1))
+    self.assertIn("anomlik", repr(inferenceResult1))
+    self.assertIn("display", repr(inferenceResult1))
+    self.assertIn("multi_step_best_predictions={1: 1}", repr(inferenceResult1))
+
+    inferenceResult2 = anomaly_service.MutableMetricDataRow(
+      uid=uid,
+      rowid=rowid,
+      metric_value=metric_value,
+      timestamp=tsDatetime1,
+      raw_anomaly_score=raw_anomaly_score,
+      anomaly_score=anomaly_score,
+      multi_step_best_predictions=None,
+      display_value=display_value
+    )
+
+    self.assertIn("MutableMetricDataRow<", repr(inferenceResult2))
+    self.assertIn("multi_step_best_predictions=None", repr(inferenceResult2))
+
 
 
 if __name__ == '__main__':

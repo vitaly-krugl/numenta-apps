@@ -41,7 +41,7 @@ from htmengine.model_swapper.model_swapper_interface import \
   MessageBusConnector, message_bus_connector, \
   ModelCommand, ModelCommandResult, ModelInputRow, ModelInferenceResult, \
   BatchPackager, RequestMessagePackager, ResultMessagePackager, \
-  ModelSwapperInterface, _ModelRequestResultBase
+  ModelSwapperInterface, _ModelRequestResultBase, ModelInferenceResultLegacyV1
 
 
 
@@ -431,14 +431,14 @@ class ModelInferenceResultTestCase(unittest.TestCase):
 
 
   def testModelInferenceResultSerializableStateWithAnomalyScoreWithPreds(self):
-    self._auxTestModelInfResSerializStateAnomScore(predictions={1: 1})
+    self._auxTestModelInferenceResultSerializStateAnomScore(predictions={1: 1})
 
 
   def testModelInferenceResultSerializableStateWithAnomalyScoreNoPreds(self):
-    self._auxTestModelInfResSerializStateAnomScore(predictions=None)
+    self._auxTestModelInferenceResultSerializStateAnomScore(predictions=None)
 
 
-  def _auxTestModelInfResSerializStateAnomScore(self, predictions):
+  def _auxTestModelInferenceResultSerializStateAnomScore(self, predictions):
     rowID = 1
     status = 0
     anomalyScore = 9.72
@@ -461,6 +461,47 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertIsNone(inferenceResult2.errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult2))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult2))
+
+
+  def testLegacyModelInferenceResultSerializableState(self):
+    rowID = 1
+    status = 0
+    anomalyScore = 0.999
+    errorMessage = None
+
+    # Legacy format of ModelInferenceResult state
+    legacyState = [ModelInferenceResultLegacyV1.__STATE_SIGNATURE__, rowID,
+                   status, anomalyScore, errorMessage]
+    inferenceResult = _ModelRequestResultBase.__createFromState__(
+      legacyState)
+
+    self.assertIsInstance(inferenceResult, ModelInferenceResult)
+    self.assertEqual(inferenceResult.__STATE_SIGNATURE__,
+                     ModelInferenceResult.__STATE_SIGNATURE__)
+    self.assertEqual(inferenceResult.rowID, rowID)
+    self.assertEqual(inferenceResult.status, status)
+    self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
+    self.assertIsNone(inferenceResult.errorMessage)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
+
+    # Now create a second inference result from first's state
+    newState = inferenceResult.__getstate__()
+
+    # First's state should contain ModelInferenceResult attributes plus state
+    # signature
+    self.assertEqual(len(newState),
+                     len(ModelInferenceResult.__slots__) + 1)
+
+    inferenceResult2 = _ModelRequestResultBase.__createFromState__(newState)
+
+    self.assertIsInstance(inferenceResult2, ModelInferenceResult)
+    self.assertEqual(inferenceResult2.__STATE_SIGNATURE__,
+                     ModelInferenceResult.__STATE_SIGNATURE__)
+    self.assertEqual(inferenceResult2.rowID, rowID)
+    self.assertEqual(inferenceResult2.status, status)
+    self.assertEqual(inferenceResult2.anomalyScore, anomalyScore)
+    self.assertIsNone(inferenceResult2.errorMessage)
+    self.assertIsNone(inferenceResult2.multiStepBestPredictions)
 
 
   def testModelInferenceResultSerializableStateWithErrorMessage(self):
@@ -599,17 +640,17 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     modelInputQPrefix = self.__class__.__name__ + ".MODEL_INPUT_QUEUE_PREFIX"
 
     with ConfigAttributePatch(
-      modelSwapperConfig.CONFIG_NAME,
-      modelSwapperConfig.baseConfigDir,
-      ((ModelSwapperInterface._CONFIG_SECTION,
-        ModelSwapperInterface._SCHEDULER_NOTIFICATION_Q_OPTION_NAME,
-        notificationQName),
-       (ModelSwapperInterface._CONFIG_SECTION,
-        ModelSwapperInterface._RESULTS_Q_OPTION_NAME,
-        resultsQName),
-       (ModelSwapperInterface._CONFIG_SECTION,
-        ModelSwapperInterface._MODEL_INPUT_Q_PREFIX_OPTION_NAME,
-        modelInputQPrefix))):
+        modelSwapperConfig.CONFIG_NAME,
+        modelSwapperConfig.baseConfigDir,
+        ((ModelSwapperInterface._CONFIG_SECTION,
+          ModelSwapperInterface._SCHEDULER_NOTIFICATION_Q_OPTION_NAME,
+          notificationQName),
+         (ModelSwapperInterface._CONFIG_SECTION,
+          ModelSwapperInterface._RESULTS_Q_OPTION_NAME,
+          resultsQName),
+         (ModelSwapperInterface._CONFIG_SECTION,
+          ModelSwapperInterface._MODEL_INPUT_Q_PREFIX_OPTION_NAME,
+          modelInputQPrefix))):
 
       swapperAPI = ModelSwapperInterface()
 

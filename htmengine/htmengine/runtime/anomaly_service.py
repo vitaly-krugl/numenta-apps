@@ -241,8 +241,8 @@ class AnomalyService(object):
 
     # Create Model
     if result.method == "defineModel":
-      self._log.info("Model was created for <%s>" % (getMetricLogPrefix(
-        metricObj)))
+      self._log.info("Model was created for <%s>",
+                     getMetricLogPrefix(metricObj))
 
       if metricObj.status == MetricStatus.CREATE_PENDING:
         with engine.connect() as conn:

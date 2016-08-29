@@ -32,6 +32,7 @@
           "type": "number"
         },
         "enableClassifier": {
+          "description": "Whether to include a classifier when creating NuPIC models. (See nupic.frameworks.opf.clamodel.CLAModel). If true, a classifier will be created with each model and its multi-step best predictions will be used to populate the metric_data table.",
           "required": false,
           "type": "boolean"
         }
