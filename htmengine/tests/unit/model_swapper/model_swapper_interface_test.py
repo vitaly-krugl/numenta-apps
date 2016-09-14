@@ -27,6 +27,7 @@ Unit tests for the model_swapper_interface classes
 import copy
 import datetime
 import json
+import numpy
 import unittest
 import uuid
 
@@ -338,23 +339,28 @@ class ModelInferenceResultTestCase(unittest.TestCase):
   """
 
 
-  def testModelInferenceResultConstructorWithSuccessStatus(self):
+  def testModelInferenceResultWithAcceptableAnomalyScoreTypes(self):
     rowID = 1
     status = 0
-    anomalyScore = 1.95
+    scoreValue = 1.95
     predictions = {1: 1.1}
-    inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-                                           anomalyScore=anomalyScore,
-                                           multiStepBestPredictions=predictions)
-    self.assertEqual(inferenceResult.rowID, rowID)
-    self.assertEqual(inferenceResult.status, status)
-    self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
-    self.assertEqual(inferenceResult.multiStepBestPredictions, predictions)
-    self.assertIsNone(inferenceResult.errorMessage)
-    self.assertIn("ModelInferenceResult<", str(inferenceResult))
-    self.assertIn("ModelInferenceResult<", repr(inferenceResult))
-    self.assertIn("anomalyScore", repr(inferenceResult))
-    self.assertIn("multiStepBestPredictions", repr(inferenceResult))
+    for anomalyScore in [int(scoreValue),
+                         long(scoreValue),
+                         float(scoreValue),
+                         numpy.float(scoreValue),
+                         numpy.float32(scoreValue)]:
+      result = ModelInferenceResult(rowID=rowID, status=status,
+                                    anomalyScore=anomalyScore,
+                                    multiStepBestPredictions=predictions)
+      self.assertEqual(result.rowID, rowID)
+      self.assertEqual(result.status, status)
+      self.assertEqual(result.anomalyScore, anomalyScore)
+      self.assertEqual(result.multiStepBestPredictions, predictions)
+      self.assertIsNone(result.errorMessage)
+      self.assertIn("ModelInferenceResult<", str(result))
+      self.assertIn("ModelInferenceResult<", repr(result))
+      self.assertIn("anomalyScore", repr(result))
+      self.assertIn("multiStepBestPredictions", repr(result))
 
 
   def testModelInferenceResultConstructorWithNoneBestPredictions(self):
@@ -430,15 +436,21 @@ class ModelInferenceResultTestCase(unittest.TestCase):
                   cm.exception.args[0])
 
 
-  def testModelInferenceResultSerializableStateWithAnomalyScoreWithPreds(self):
-    self._auxTestModelInferenceResultSerializStateAnomScore(predictions={1: 1})
+  def testModelInferenceResultSerializableStateWithAnomalyScoreWithPredictions(
+      self):
+    self._auxTestModelInferenceResultSerializableStateWithAnomalyScore(
+      predictions={1: 1})
 
 
-  def testModelInferenceResultSerializableStateWithAnomalyScoreNoPreds(self):
-    self._auxTestModelInferenceResultSerializStateAnomScore(predictions=None)
+  def testModelInferenceResultSerializableStateWithAnomalyScoreNoPredictions(
+      self):
+    self._auxTestModelInferenceResultSerializableStateWithAnomalyScore(
+      predictions=None)
 
 
-  def _auxTestModelInferenceResultSerializStateAnomScore(self, predictions):
+  def _auxTestModelInferenceResultSerializableStateWithAnomalyScore(self,
+                                                                    predictions
+                                                                   ):
     rowID = 1
     status = 0
     anomalyScore = 9.72

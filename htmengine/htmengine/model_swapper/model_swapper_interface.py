@@ -70,6 +70,7 @@ App layer reads results::
 from collections import namedtuple
 import datetime
 import json
+import numbers
 import types
 import uuid
 import weakref
@@ -391,7 +392,7 @@ class ModelInferenceResult(_ModelRequestResultBase):
     :param rowID: rowID id of the corresponding input record
     :param status: integer; 0 (zero) means success, otherwise it's an error code
       from htmengine.htmengineerno
-    :param anomalyScore: the Anomaly Score floating point value if status is 0
+    :param anomalyScore: the Anomaly Score numerical value if status is 0
       (zero), omit otherwise
     :param multiStepBestPredictions: The best model predictions according to the
      model's associated classifier. If the classifier is not enabled the value
@@ -409,9 +410,9 @@ class ModelInferenceResult(_ModelRequestResultBase):
       "Expected int or long as status, but got: " + repr(status))
 
     if status == 0:
-      assert isinstance(anomalyScore, (int, long, float)), (
-        "Expected numeric anomaly score with status=0, but got: " +
-        repr(anomalyScore))
+      assert isinstance(anomalyScore, numbers.Number), (
+        "Expected numeric anomaly score with status=0, but got: {} ({})".format(
+          repr(anomalyScore), type(anomalyScore)))
       assert (multiStepBestPredictions is None or
               isinstance(multiStepBestPredictions, dict)), \
         ("Expected None or dict multi-step best predictions with status=0, but "
