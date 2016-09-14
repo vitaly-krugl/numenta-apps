@@ -27,6 +27,7 @@ Unit tests for the model_swapper_interface classes
 import copy
 import datetime
 import json
+import numpy
 import os
 import unittest
 import uuid
@@ -339,19 +340,25 @@ class ModelInferenceResultTestCase(unittest.TestCase):
   """
 
 
-  def testModelInferenceResultConstructorWithSuccessStatus(self):
+  def testModelInferenceResultWithAcceptableAnomalyScoreTypes(self):
     rowID = 1
     status = 0
-    anomalyScore = 1.95
-    inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      anomalyScore=anomalyScore)
-    self.assertEqual(inferenceResult.rowID, rowID)
-    self.assertEqual(inferenceResult.status, status)
-    self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
-    self.assertIsNone(inferenceResult.errorMessage)
-    self.assertIn("ModelInferenceResult<", str(inferenceResult))
-    self.assertIn("ModelInferenceResult<", repr(inferenceResult))
-    self.assertIn("anomalyScore", repr(inferenceResult))
+    scoreValue = 1.95
+    for anomalyScore in [int(scoreValue),
+                         long(scoreValue),
+                         float(scoreValue),
+                         numpy.float(scoreValue),
+                         numpy.float32(scoreValue)]:
+      result = ModelInferenceResult(rowID=rowID, status=status,
+                                    anomalyScore=anomalyScore)
+      self.assertEqual(result.rowID, rowID)
+      self.assertEqual(result.status, status)
+      self.assertEqual(result.anomalyScore, anomalyScore)
+      self.assertIsNone(result.errorMessage)
+      self.assertIn("ModelInferenceResult<", str(result))
+      self.assertIn("ModelInferenceResult<", repr(result))
+      self.assertIn("anomalyScore", repr(result))
+
 
 
   def testModelInferenceResultConstructorWithErrorStatus(self):
