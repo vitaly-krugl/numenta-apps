@@ -70,6 +70,7 @@ App layer reads results::
 from collections import namedtuple
 import datetime
 import json
+import numbers
 import time
 import types
 import uuid
@@ -384,7 +385,7 @@ class ModelInferenceResult(_ModelRequestResultBase):
     :param rowID: rowID id of the corresponding input record
     :param status: integer; 0 (zero) means success, otherwise it's an error code
       from htmengine.htmengineerno
-    :param anomalyScore: the Anomaly Score floating point value if status is 0
+    :param anomalyScore: the Anomaly Score numerical value if status is 0
       (zero), omit otherwise
     :param errorMessage: error message if status is non-zero, omit otherwise
     """
@@ -392,9 +393,9 @@ class ModelInferenceResult(_ModelRequestResultBase):
       "Expected int or long as status, but got: " + repr(status))
 
     if status == 0:
-      assert isinstance(anomalyScore, (int, long, float)), (
-        "Expected numeric anomaly score with status=0, but got: " +
-        repr(anomalyScore))
+      assert isinstance(anomalyScore, numbers.Number), (
+        "Expected numeric anomaly score with status=0, but got: {} ({})".format(
+          repr(anomalyScore), type(anomalyScore)))
       assert errorMessage is None, (
         "Unexpected errorMessage with status=0: " + repr(errorMessage))
     else:
