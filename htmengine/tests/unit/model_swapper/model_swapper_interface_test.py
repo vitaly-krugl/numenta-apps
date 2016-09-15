@@ -28,7 +28,6 @@ import copy
 import datetime
 import json
 import numpy
-import os
 import unittest
 import uuid
 
@@ -43,7 +42,7 @@ from htmengine.model_swapper.model_swapper_interface import \
   MessageBusConnector, message_bus_connector, \
   ModelCommand, ModelCommandResult, ModelInputRow, ModelInferenceResult, \
   BatchPackager, RequestMessagePackager, ResultMessagePackager, \
-  ModelSwapperInterface, _ModelRequestResultBase
+  ModelSwapperInterface, _ModelRequestResultBase, ModelInferenceResultLegacyV1
 
 
 
@@ -344,21 +343,42 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     rowID = 1
     status = 0
     scoreValue = 1.95
+    predictions = {1: 1.1}
     for anomalyScore in [int(scoreValue),
                          long(scoreValue),
                          float(scoreValue),
                          numpy.float(scoreValue),
                          numpy.float32(scoreValue)]:
       result = ModelInferenceResult(rowID=rowID, status=status,
-                                    anomalyScore=anomalyScore)
+                                    anomalyScore=anomalyScore,
+                                    multiStepBestPredictions=predictions)
       self.assertEqual(result.rowID, rowID)
       self.assertEqual(result.status, status)
       self.assertEqual(result.anomalyScore, anomalyScore)
+      self.assertEqual(result.multiStepBestPredictions, predictions)
       self.assertIsNone(result.errorMessage)
       self.assertIn("ModelInferenceResult<", str(result))
       self.assertIn("ModelInferenceResult<", repr(result))
       self.assertIn("anomalyScore", repr(result))
+      self.assertIn("multiStepBestPredictions", repr(result))
 
+
+  def testModelInferenceResultConstructorWithNoneBestPredictions(self):
+    rowID = 1
+    status = 0
+    anomalyScore = 1.95
+    inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
+                                           anomalyScore=anomalyScore,
+                                           multiStepBestPredictions=None)
+    self.assertEqual(inferenceResult.rowID, rowID)
+    self.assertEqual(inferenceResult.status, status)
+    self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
+    self.assertIsNone(inferenceResult.errorMessage)
+    self.assertIn("ModelInferenceResult<", str(inferenceResult))
+    self.assertIn("ModelInferenceResult<", repr(inferenceResult))
+    self.assertIn("anomalyScore", repr(inferenceResult))
+    self.assertIn("multiStepBestPredictions", repr(inferenceResult))
 
 
   def testModelInferenceResultConstructorWithErrorStatus(self):
@@ -366,10 +386,11 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     status = 1
     errorMessage = "something bad"
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      errorMessage=errorMessage)
+                                           errorMessage=errorMessage)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertIsNone(inferenceResult.anomalyScore)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
     self.assertEqual(inferenceResult.errorMessage, errorMessage)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("errorMsg", str(inferenceResult))
@@ -389,39 +410,110 @@ class ModelInferenceResultTestCase(unittest.TestCase):
                   cm.exception.args[0])
 
 
+  def testModelInferenceResultConstructorInvalidMultiStepBestPredictions(self):
+    rowID = 1
+    status = 0
+    anomalyScore = 0.5
+    multiStepBestPrediction = 1.0
+
+    with self.assertRaises(AssertionError) as cm:
+      ModelInferenceResult(rowID=rowID, status=status,
+                           anomalyScore=anomalyScore,
+                           multiStepBestPredictions=multiStepBestPrediction)
+    self.assertIn(("Expected None or dict multi-step best predictions with "
+                   "status=0, but got"),
+                  cm.exception.args[0])
+
+
   def testModelInferenceResultConstructorMissingErrorMessage(self):
     rowID = 1
     status = 1
     errorMessage = None
     with self.assertRaises(AssertionError) as cm:
       ModelInferenceResult(rowID=rowID, status=status,
-        errorMessage=errorMessage)
+                           errorMessage=errorMessage)
     self.assertIn("Unexpected errorMessage type with non-zero status",
                   cm.exception.args[0])
 
 
-  def testModelInferenceResultSerializableStateWithAnomalyScore(self):
+  def testModelInferenceResultSerializableStateWithAnomalyScoreWithPredictions(
+      self):
+    self._auxTestModelInferenceResultSerializableStateWithAnomalyScore(
+      predictions={1: 1})
+
+
+  def testModelInferenceResultSerializableStateWithAnomalyScoreNoPredictions(
+      self):
+    self._auxTestModelInferenceResultSerializableStateWithAnomalyScore(
+      predictions=None)
+
+
+  def _auxTestModelInferenceResultSerializableStateWithAnomalyScore(self,
+                                                                    predictions
+                                                                   ):
     rowID = 1
     status = 0
     anomalyScore = 9.72
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      anomalyScore=anomalyScore)
+                                           anomalyScore=anomalyScore,
+                                           multiStepBestPredictions=predictions)
+    self.assertEqual(inferenceResult.rowID, rowID)
+    self.assertEqual(inferenceResult.status, status)
+    self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
+    self.assertEqual(inferenceResult.multiStepBestPredictions, predictions)
+    self.assertIsNone(inferenceResult.errorMessage)
+    self.assertIn("ModelInferenceResult<", str(inferenceResult))
+    self.assertIn("ModelInferenceResult<", repr(inferenceResult))
+    inferenceResult2 = _ModelRequestResultBase.__createFromState__(
+      inferenceResult.__getstate__())
+    self.assertEqual(inferenceResult2.rowID, rowID)
+    self.assertEqual(inferenceResult2.status, status)
+    self.assertEqual(inferenceResult2.anomalyScore, anomalyScore)
+    self.assertEqual(inferenceResult2.multiStepBestPredictions, predictions)
+    self.assertIsNone(inferenceResult2.errorMessage)
+    self.assertIn("ModelInferenceResult<", str(inferenceResult2))
+    self.assertIn("ModelInferenceResult<", repr(inferenceResult2))
+
+
+  def testLegacyModelInferenceResultSerializableState(self):
+    rowID = 1
+    status = 0
+    anomalyScore = 0.999
+    errorMessage = None
+
+    # Legacy format of ModelInferenceResult state
+    legacyState = [ModelInferenceResultLegacyV1.__STATE_SIGNATURE__, rowID,
+                   status, anomalyScore, errorMessage]
+    inferenceResult = _ModelRequestResultBase.__createFromState__(
+      legacyState)
+
+    self.assertIsInstance(inferenceResult, ModelInferenceResult)
+    self.assertEqual(inferenceResult.__STATE_SIGNATURE__,
+                     ModelInferenceResult.__STATE_SIGNATURE__)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.anomalyScore, anomalyScore)
     self.assertIsNone(inferenceResult.errorMessage)
-    self.assertIn("ModelInferenceResult<", str(inferenceResult))
-    self.assertIn("ModelInferenceResult<", repr(inferenceResult))
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
 
-    inferenceResult2 = _ModelRequestResultBase.__createFromState__(
-      inferenceResult.__getstate__())
+    # Now create a second inference result from first's state
+    newState = inferenceResult.__getstate__()
 
+    # First's state should contain ModelInferenceResult attributes plus state
+    # signature
+    self.assertEqual(len(newState),
+                     len(ModelInferenceResult.__slots__) + 1)
+
+    inferenceResult2 = _ModelRequestResultBase.__createFromState__(newState)
+
+    self.assertIsInstance(inferenceResult2, ModelInferenceResult)
+    self.assertEqual(inferenceResult2.__STATE_SIGNATURE__,
+                     ModelInferenceResult.__STATE_SIGNATURE__)
     self.assertEqual(inferenceResult2.rowID, rowID)
     self.assertEqual(inferenceResult2.status, status)
     self.assertEqual(inferenceResult2.anomalyScore, anomalyScore)
     self.assertIsNone(inferenceResult2.errorMessage)
-    self.assertIn("ModelInferenceResult<", str(inferenceResult2))
-    self.assertIn("ModelInferenceResult<", repr(inferenceResult2))
+    self.assertIsNone(inferenceResult2.multiStepBestPredictions)
 
 
   def testModelInferenceResultSerializableStateWithErrorMessage(self):
@@ -429,11 +521,12 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     status = 1
     errorMessage = "error"
     inferenceResult = ModelInferenceResult(rowID=rowID, status=status,
-      errorMessage=errorMessage)
+                                           errorMessage=errorMessage)
     self.assertEqual(inferenceResult.rowID, rowID)
     self.assertEqual(inferenceResult.status, status)
     self.assertEqual(inferenceResult.errorMessage, errorMessage)
     self.assertIsNone(inferenceResult.anomalyScore)
+    self.assertIsNone(inferenceResult.multiStepBestPredictions)
     self.assertIn("ModelInferenceResult<", str(inferenceResult))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult))
 
@@ -444,6 +537,7 @@ class ModelInferenceResultTestCase(unittest.TestCase):
     self.assertEqual(inferenceResult2.status, status)
     self.assertEqual(inferenceResult2.errorMessage, errorMessage)
     self.assertIsNone(inferenceResult2.anomalyScore)
+    self.assertIsNone(inferenceResult2.multiStepBestPredictions)
     self.assertIn("ModelInferenceResult<", str(inferenceResult2))
     self.assertIn("ModelInferenceResult<", repr(inferenceResult2))
 
@@ -456,11 +550,11 @@ class BatchPackagerTestCase(unittest.TestCase):
 
   def testMarshalUnmarshal(self):
     inputBatch = [
-        ModelCommandResult(commandID="commandID", method="testMethod", status=1,
-          errorMessage="errorMessage"),
-        ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
-        ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
-      ]
+      ModelCommandResult(commandID="commandID", method="testMethod", status=1,
+                         errorMessage="errorMessage"),
+      ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
+      ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
+    ]
     batchState = BatchPackager.marshal(batch=inputBatch)
 
     requestBatch = BatchPackager.unmarshal(batchState=batchState)
@@ -477,11 +571,11 @@ class RequestMessagePackagerTestCase(unittest.TestCase):
 
   def testMarshalAndUnmarshal(self):
     requestBatch = [
-        ModelCommand(commandID="abc", method="defineModel",
-          args={'key1': 4098, 'key2': 4139}),
-        ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
-        ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
-      ]
+      ModelCommand(commandID="abc", method="defineModel",
+                   args={'key1': 4098, 'key2': 4139}),
+      ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
+      ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"]),
+    ]
     batchState = BatchPackager.marshal(batch=requestBatch)
     msg = RequestMessagePackager.marshal(batchID="foobar",
                                          batchState=batchState)
@@ -504,9 +598,11 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
   def testMarshalAndUnmarshal(self):
     resultBatch = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+                         args={'key1': 4098, 'key2': 4139}),
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions=None),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions={1: 2})
       ]
     batchState = BatchPackager.marshal(batch=resultBatch)
     msg = ResultMessagePackager.marshal(modelID="foobar", batchState=batchState)
@@ -515,7 +611,6 @@ class ResultMessagePackagerTestCase(unittest.TestCase):
 
     self.assertEqual(r.modelID, "foobar")
     self.assertEqual(r.batchState, batchState)
-
 
     # Make sure we aren't forgetting to test any returned fields
     self.assertEqual(set(["modelID", "batchState"]), set(r._fields))
@@ -583,7 +678,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testSubmitRequestsWithContextManager(self, messageBusConnectorClassMock):
     requests = [
       ModelCommand(commandID="abc", method="defineModel",
-        args={'key1': 4098, 'key2': 4139}),
+                   args={'key1': 4098, 'key2': 4139}),
       ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
       ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"])
     ]
@@ -620,7 +715,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
       self, messageBusConnectorClassMock):
     requests = [
       ModelCommand(commandID="abc", method="defineModel",
-        args={'key1': 4098, 'key2': 4139}),
+                   args={'key1': 4098, 'key2': 4139}),
       ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
       ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"])
     ]
@@ -654,7 +749,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # notification message queue is created at startup of model scheduler
     requests = [
       ModelCommand(commandID="abc", method="defineModel",
-        args={'key1': 4098, 'key2': 4139}),
+                   args={'key1': 4098, 'key2': 4139}),
       ModelInputRow(rowID="foo", data=[1, 2, "Sep 21 02:24:21 UTC 2013"]),
       ModelInputRow(rowID="bar", data=[9, 54, "Sep 21 02:24:38 UTC 2013"])
     ]
@@ -854,7 +949,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # Configure mocks
 
     exception = message_bus_connector.MessageQueueNotFound(
-                  "publish failed in mock test")
+      "publish failed in mock test")
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
     messageBusConnectorMock.purge.side_effect = exception
@@ -877,7 +972,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # Configure mocks
 
     exception = message_bus_connector.MessageQueueNotFound(
-                  "publish failed in mock test")
+      "publish failed in mock test")
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
     messageBusConnectorMock.publish.side_effect = exception
@@ -944,7 +1039,7 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     model_swapper_interface, "MessageBusConnector", autospec=True,
     isEmpty=Mock(spec_set=MessageBusConnector.isEmpty))
   def testModelInputPendingMessageQueueNotFoundInterpretedAsNo(
-    self, messageBusConnectorClassMock):
+      self, messageBusConnectorClassMock):
     modelID = "model_foo"
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1013,9 +1108,11 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testSubmitResults(self, messageBusConnectorClassMock):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+                         args={'key1': 4098, 'key2': 4139}),
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions={1: 1}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions=None)
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1043,9 +1140,11 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
     # the results message queue and re-publishing the message
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+                         args={'key1': 4098, 'key2': 4139}),
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions=None),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions={1: 2})
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1079,9 +1178,11 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testSubmitResultsFailure(self, messageBusConnectorClassMock):
     results = [
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2)
+                         args={'key1': 4098, 'key2': 4139}),
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1,
+                           multiStepBestPredictions={1: 1}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2,
+                           multiStepBestPredictions=None)
     ]
 
     messageBusConnectorMock = messageBusConnectorClassMock.return_value
@@ -1119,9 +1220,11 @@ class ModelSwapperInterfaceTestCase(unittest.TestCase):
   def testContextManagerAndConsumeResults(self, messageBusConnectorClassMock):
     expectedResults = (
       ModelCommandResult(commandID="abc", method="testMethod", status=0,
-        args={'key1': 4098, 'key2': 4139}),
-      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3),
-      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9)
+                         args={'key1': 4098, 'key2': 4139}),
+      ModelInferenceResult(rowID="foo", status=0, anomalyScore=1.3,
+                           multiStepBestPredictions={"1": 1}),
+      ModelInferenceResult(rowID="bar", status=0, anomalyScore=2.9,
+                           multiStepBestPredictions={"1": 2})
     )
     modelID = "foobar"
     msg = ResultMessagePackager.marshal(

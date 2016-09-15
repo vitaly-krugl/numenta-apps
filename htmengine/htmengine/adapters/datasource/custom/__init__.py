@@ -25,20 +25,17 @@ HTM Engine Metric Datasource Adapter
 
 import copy
 import datetime
+import json
 
+from htmengine import htmengine_logging, repository
 from htmengine.adapters.datasource.datasource_adapter_iface import (
   DatasourceAdapterIface)
-
 import htmengine.exceptions as app_exceptions
-from htmengine import htmengine_logging
-
-from htmengine import repository
+import htmengine.model_swapper.utils as model_swapper_utils
 from htmengine.repository import schema
 from htmengine.repository.queries import MetricStatus
 from htmengine.runtime import scalar_metric_utils
 import htmengine.utils
-import htmengine.model_swapper.utils as model_swapper_utils
-from nupic.data import fieldmeta
 
 
 
@@ -271,7 +268,7 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
       elif "metric" in metricSpec:
         # Via metric name
         try:
-          # Crete the metric, if needed
+          # Create the metric, if needed
           metricId = repository.retryOnTransientErrors(self._createMetric)(
             conn, metricSpec["metric"])
         except app_exceptions.MetricAlreadyExists as e:
@@ -293,6 +290,7 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
       minVal = modelParams.get("min")
       maxVal = modelParams.get("max")
       minResolution = modelParams.get("minResolution")
+      enableClassifier = modelParams.get("enableClassifier", False)
       if (minVal is None) != (maxVal is None):
         raise ValueError(
           "min and max params must both be None or non-None; metric=%s; "
@@ -319,7 +317,8 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
       stats = {"min": minVal, "max": maxVal, "minResolution": minResolution}
       self._log.debug("monitorMetric: metric=%s, stats=%r", metricId, stats)
 
-      swarmParams = scalar_metric_utils.generateSwarmParams(stats)
+      swarmParams = scalar_metric_utils.generateSwarmParams(stats,
+                                                            enableClassifier)
 
     self._startMonitoringWithRetries(metricId, modelSpec, swarmParams)
 
@@ -402,7 +401,8 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
     with self.connectionFactory() as conn:
       metricObj = repository.getMetric(conn,
                                        metricId,
-                                       fields=[schema.metric.c.datasource])
+                                       fields=[schema.metric.c.datasource,
+                                               schema.metric.c.parameters])
 
     if metricObj.datasource != self._DATASOURCE:
       raise TypeError(
@@ -411,7 +411,14 @@ class _CustomDatasourceAdapter(DatasourceAdapterIface):
 
     stats = self._getMetricStatistics(metricId)
 
-    swarmParams = scalar_metric_utils.generateSwarmParams(stats)
+    enableClassifier = False
+    metricParameters = json.loads(metricObj.parameters)
+    if "modelParams" in metricParameters:
+      enableClassifier = metricParameters["modelParams"].get("enableClassifier",
+                                                             False)
+
+    swarmParams = scalar_metric_utils.generateSwarmParams(stats,
+                                                          enableClassifier)
 
     scalar_metric_utils.startModel(metricId,
                                    swarmParams=swarmParams,
