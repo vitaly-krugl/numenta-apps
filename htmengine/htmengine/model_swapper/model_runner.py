@@ -39,7 +39,9 @@ import traceback
 from nupic.data.fieldmeta import FieldMetaInfo
 from nupic.data.record_stream import RecordStreamIface
 from nupic.frameworks.opf.modelfactory import ModelFactory
-from nupic.support.decorators import logExceptions
+
+from nta.utils.error_handling import logExceptions
+from nta.utils.logging_support_raw import LoggingSupport
 
 from htmengine import htmengineerrno
 from htmengine.htmengine_logging import getExtendedLogger, getStandardLogPrefix
@@ -50,8 +52,6 @@ from htmengine.model_swapper import ModelSwapperConfig
 from htmengine.model_swapper.model_swapper_interface import (
   ModelCommand, ModelCommandResult, ModelInferenceResult, ModelInputRow,
   ModelSwapperInterface)
-
-from nta.utils.logging_support_raw import LoggingSupport
 
 
 
@@ -169,7 +169,7 @@ class ModelRunner(object):
     self._swapperAPI.close()
 
 
-  @logExceptions(_getLogger)
+  @logExceptions(_getLogger())
   def run(self):
     startTime = time.time()
 

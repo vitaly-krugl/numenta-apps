@@ -33,11 +33,11 @@ import sys
 import threading
 
 
-from nupic.support.decorators import logExceptions
+from nta.utils.error_handling import abortProgramOnAnyException
+from nta.utils.error_handling import logExceptions
+
 
 from htmengine import htmengine_logging
-
-from nta.utils.error_handling import abortProgramOnAnyException
 
 
 
@@ -163,7 +163,7 @@ class ModelRunnerProxy(object):
   @abortProgramOnAnyException(
     _EXIT_CODE_ON_UNHANDLED_EXCEPTION_IN_THREAD,
     logger=_getLogger())
-  @logExceptions(_getLogger)
+  @logExceptions(_getLogger())
   def _runProcessMonitorThread(self):
     self._logger.debug("%s: _runProcessMonitorThread is running", self)
     self._process.wait()
@@ -279,7 +279,7 @@ class SlotAgent(object):
   @abortProgramOnAnyException(
     _EXIT_CODE_ON_UNHANDLED_EXCEPTION_IN_THREAD,
     logger=_getLogger())
-  @logExceptions(_getLogger)
+  @logExceptions(_getLogger())
   def _runEventLoop(self):
     """ Thread function for servicing the slot: starts the ModelRunner process,
     feeds data to it, stops it, detects the stop, and notifies user that it
