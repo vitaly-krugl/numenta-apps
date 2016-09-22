@@ -3362,8 +3362,7 @@
         }, 
         "provider": "twitter", 
         "screenNames": [
-          "Honeywellnow", 
-          "HoneywellSec"
+          "Honeywellnow"
         ]
       }, 
       "XIGNITE.HON.CLOSINGPRICE": {
