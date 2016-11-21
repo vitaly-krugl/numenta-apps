@@ -2276,7 +2276,8 @@
         }, 
         "provider": "twitter", 
         "screenNames": [
-          "DN_Global"
+          "Discover", 
+          "DiscoverGlobal"
         ]
       }, 
       "XIGNITE.DFS.CLOSINGPRICE": {
@@ -4696,7 +4697,7 @@
         }, 
         "provider": "twitter", 
         "screenNames": [
-          "PPGIndustries"
+          "PPG"
         ]
       }, 
       "XIGNITE.PPG.CLOSINGPRICE": {
@@ -5739,7 +5740,7 @@
         }, 
         "provider": "twitter", 
         "screenNames": [
-          "ServingScience"
+          "thermofisher"
         ]
       }, 
       "XIGNITE.TMO.CLOSINGPRICE": {
