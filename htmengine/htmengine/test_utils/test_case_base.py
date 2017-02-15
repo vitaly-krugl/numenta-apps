@@ -19,7 +19,7 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
-# This script implements an extension of the unittest2.TestCase class to be
+# This script implements an extension of the unittest.TestCase class to be
 # used as a base class unit tests
 
 import sys
