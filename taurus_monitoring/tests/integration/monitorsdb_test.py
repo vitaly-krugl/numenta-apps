@@ -22,7 +22,7 @@
 
 import multiprocessing
 from subprocess import Popen, PIPE
-import unittest2 as unittest
+import unittest
 
 import sqlalchemy
 import sqlalchemy.exc
