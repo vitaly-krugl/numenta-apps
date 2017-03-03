@@ -1,7 +1,7 @@
 #!/bin/bash
 # ----------------------------------------------------------------------
 # Numenta Platform for Intelligent Computing (NuPIC)
-# Copyright (C) 2015, Numenta, Inc.  Unless you have purchased from
+# Copyright (C) 2016, Numenta, Inc.  Unless you have purchased from
 # Numenta, Inc. a separate commercial license for this software code, the
 # following terms and conditions apply:
 #
@@ -19,16 +19,19 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
+#
 
+# Be extra verbose and sensitive to failures
 set -o errexit
+set -o pipefail
+set -o verbose
+set -o xtrace
+set -o nounset
 
-function install {
-  pushd $1
-    python setup.py develop --prefix=$2
-  popd
-}
+pushd /opt/numenta/taurus_monitoring
 
-install nta.utils $1
-install htmengine $1
-install taurus_engine $1
-install taurus_monitoring $1
+# Configure instance
+./docker/configure.sh
+
+# Pass-through Docker CMD
+$@
