@@ -48,7 +48,7 @@ chmod a+x /usr/local/bin/start-emulator
 
 # Download latest local dynamodb tool
 WORKDIR /opt/numenta/dynamodb
-RUN wget -qO- http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest | tar xz
+RUN wget -qO- https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz | tar xz
 RUN echo "java -Djava.library.path=/opt/numenta/dynamodb/DynamoDBLocal_lib -jar /opt/numenta/dynamodb/DynamoDBLocal.jar -inMemory -sharedDb &" > /usr/local/bin/start-dynamodb;\
 chmod a+x /usr/local/bin/start-dynamodb
 
