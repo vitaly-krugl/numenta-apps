@@ -5379,41 +5379,6 @@
     "stockExchange": "NYSE", 
     "symbol": "SCCO"
   }, 
-  "Spectra Energy": {
-    "metrics": {
-      "TWITTER.TWEET.HANDLE.SE.VOLUME": {
-        "metricType": "TwitterVolume", 
-        "metricTypeName": "Twitter Volume", 
-        "modelParams": {
-          "minResolution": 0.6
-        }, 
-        "provider": "twitter", 
-        "screenNames": [
-          "SpectraEnergy"
-        ]
-      }, 
-      "XIGNITE.SE.CLOSINGPRICE": {
-        "metricType": "StockPrice", 
-        "metricTypeName": "Stock Price", 
-        "modelParams": {
-          "minResolution": 0.2
-        }, 
-        "provider": "xignite", 
-        "sampleKey": "Close"
-      }, 
-      "XIGNITE.SE.VOLUME": {
-        "metricType": "StockVolume", 
-        "metricTypeName": "Stock Volume", 
-        "modelParams": {
-          "minResolution": 0.2
-        }, 
-        "provider": "xignite", 
-        "sampleKey": "Volume"
-      }
-    }, 
-    "stockExchange": "NYSE", 
-    "symbol": "SE"
-  }, 
   "Sprint": {
     "metrics": {
       "TWITTER.TWEET.HANDLE.S.VOLUME": {
