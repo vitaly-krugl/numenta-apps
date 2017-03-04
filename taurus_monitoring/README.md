@@ -88,3 +88,39 @@ taurus-model-latency-monitor \
 Additionally, should you need to manually clear out all notifications, there
 is a helper utility, `taurus-clear-monitor-notifications`, that will prompt
 the user to delete all notifications.
+
+### Docker
+
+A [Dockerfile](https://docs.docker.com/engine/reference/builder/) is included
+to support a docker-based workflow.  To build a docker image, run the following
+command from the root of the `numenta-apps` repository (the parent directory
+of `taurus_monitoring/`):
+
+```
+docker build -t taurus-monitoring:latest -f taurus_monitoring/Dockerfile .
+```
+
+See `Dockerfile` for specific environment variable configuration directives.
+
+Prefix each of the commands in the "Running monitors" section above with
+the following, substituting correct environment variable values:
+
+```
+docker run \
+    -e DB_HOST=... \
+    -e DB_USER=... \
+    -e DB_PASSWORD=... \
+    -e MODELS_MONITOR_TAURUS_API_KEY=... \
+    -e MODELS_MONITOR_TAURUS_MODELS_URL=... \
+    -e MODELS_MONITOR_EMAIL_AWS_REGION=... \
+    -e MODELS_MONITOR_EMAIL_SES_ENDPOINT=... \
+    -e MODELS_MONITOR_EMAIL_SENDER_ADDRESS=... \
+    -e MODELS_MONITOR_EMAIL_RECIPIENTS=... \
+    -e MODELS_MONITOR_TAURUS_DYNAMODB_REGION=... \
+    -e MODELS_MONITOR_TAURUS_DYNAMODB_AWS_ACCESS_KEY_ID=... \
+    -e MODELS_MONITOR_TAURUS_DYNAMODB_AWS_SECRET_ACCESS_KEY=... \
+    taurus-monitoring:latest 
+```
+
+Alternatively, define the same environment variables in a separate file
+along with `--env-file` (see https://docs.docker.com/engine/reference/commandline/run/)
