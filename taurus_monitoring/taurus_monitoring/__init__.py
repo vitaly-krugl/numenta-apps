@@ -82,8 +82,10 @@ def loadEmailParamsFromConfig(config):
     recipients=config.get("S1", "MODELS_MONITOR_EMAIL_RECIPIENTS"),
     awsRegion= config.get("S1", "MODELS_MONITOR_EMAIL_AWS_REGION"),
     sesEndpoint=config.get("S1", "MODELS_MONITOR_EMAIL_SES_ENDPOINT"),
-    awsAccessKeyId=None,
-    awsSecretAccessKey=None
+    awsAccessKeyId=(
+      config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_ACCESS_KEY_ID")),
+    awsSecretAccessKey=(
+      config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_SECRET_ACCESS_KEY"))
   )
 
 
