@@ -216,12 +216,14 @@ def main():
                               monitoredResource.split(":")[1] + ":***@" +
                               monitoredResource.split(":")[2].split("@")[1])
 
-    emailParams = dict(senderAddress=config.get("S1", "EMAIL_SENDER_ADDRESS"),
-                       recipients=config.get("S1", "EMAIL_RECIPIENTS"),
-                       awsRegion= config.get("S1", "EMAIL_AWS_REGION"),
-                       sesEndpoint=config.get("S1", "EMAIL_SES_ENDPOINT"),
-                       awsAccessKeyId=None,
-                       awsSecretAccessKey=None)
+    emailParams = dict(
+      senderAddress=config.get("S1", "EMAIL_SENDER_ADDRESS"),
+      recipients=config.get("S1", "EMAIL_RECIPIENTS"),
+      awsRegion= config.get("S1", "EMAIL_AWS_REGION"),
+      sesEndpoint=config.get("S1", "EMAIL_SES_ENDPOINT"),
+      awsAccessKeyId=config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_ACCESS_KEY_ID"),
+      awsSecretAccessKey=config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_SECRET_ACCESS_KEY")
+    )
 
     if args.testEmail:
       g_logger.info("Sending an email for test purposes.")

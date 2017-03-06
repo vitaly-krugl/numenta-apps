@@ -246,12 +246,14 @@ def main():
     modelsUrl = config.get("S1", "MODELS_MONITOR_TAURUS_MODELS_URL")
     apiKey = config.get("S1", "MODELS_MONITOR_TAURUS_API_KEY")
 
-    emailParams = dict(senderAddress=config.get("S1", "MODELS_MONITOR_EMAIL_SENDER_ADDRESS"),
-                       recipients=config.get("S1", "MODELS_MONITOR_EMAIL_RECIPIENTS"),
-                       awsRegion= config.get("S1", "MODELS_MONITOR_EMAIL_AWS_REGION"),
-                       sesEndpoint=config.get("S1", "MODELS_MONITOR_EMAIL_SES_ENDPOINT"),
-                       awsAccessKeyId=None,
-                       awsSecretAccessKey=None)
+    emailParams = dict(
+      senderAddress=config.get("S1", "MODELS_MONITOR_EMAIL_SENDER_ADDRESS"),
+      recipients=config.get("S1", "MODELS_MONITOR_EMAIL_RECIPIENTS"),
+      awsRegion= config.get("S1", "MODELS_MONITOR_EMAIL_AWS_REGION"),
+      sesEndpoint=config.get("S1", "MODELS_MONITOR_EMAIL_SES_ENDPOINT"),
+      awsAccessKeyId=config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_ACCESS_KEY_ID"),
+      awsSecretAccessKey=config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_SECRET_ACCESS_KEY")
+    )
 
     dbConf= os.getenv("TAURUS_MONITORS_DB_CONFIG_PATH",
                       "Couldn't read TAURUS_MONITORS_DB_CONFIG_PATH")
