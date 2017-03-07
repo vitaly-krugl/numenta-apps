@@ -221,8 +221,8 @@ def main():
       recipients=config.get("S1", "EMAIL_RECIPIENTS"),
       awsRegion= config.get("S1", "EMAIL_AWS_REGION"),
       sesEndpoint=config.get("S1", "EMAIL_SES_ENDPOINT"),
-      awsAccessKeyId=config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_ACCESS_KEY_ID"),
-      awsSecretAccessKey=config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_SECRET_ACCESS_KEY")
+      awsAccessKeyId=config.get("S1", "EMAIL_SES_AWS_ACCESS_KEY_ID"),
+      awsSecretAccessKey=config.get("S1", "EMAIL_SES_AWS_SECRET_ACCESS_KEY")
     )
 
     if args.testEmail:

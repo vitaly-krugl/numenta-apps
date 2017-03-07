@@ -45,15 +45,18 @@ directives.  Save the result somewhere, say `conf/monitoring.conf`:
 
 ```
 [S1]
-MODELS_MONITOR_TAURUS_API_KEY=
-MODELS_MONITOR_TAURUS_MODELS_URL=https://<taurus server host>/_models
-MODELS_MONITOR_EMAIL_AWS_REGION=us-east-1
-MODELS_MONITOR_EMAIL_SES_ENDPOINT=email.us-east-1.amazonaws.com
-MODELS_MONITOR_EMAIL_SENDER_ADDRESS=support@numenta.com
-MODELS_MONITOR_EMAIL_RECIPIENTS=
-MODELS_MONITOR_TAURUS_DYNAMODB_REGION=
-MODELS_MONITOR_TAURUS_DYNAMODB_AWS_ACCESS_KEY_ID=
-MODELS_MONITOR_TAURUS_DYNAMODB_AWS_SECRET_ACCESS_KEY=
+TAURUS_API_KEY=
+TAURUS_MODELS_URL=https://<taurus server host>/_models
+EMAIL_AWS_REGION=us-east-1
+EMAIL_SES_ENDPOINT=email.us-east-1.amazonaws.com
+EMAIL_SES_AWS_ACCESS_KEY_ID=
+EMAIL_SES_AWS_SECRET_ACCESS_KEY=
+EMAIL_SENDER_ADDRESS=support@numenta.com
+EMAIL_RECIPIENTS=support@numenta.com
+TAURUS_DYNAMODB_REGION=
+TAURUS_DYNAMODB_AWS_ACCESS_KEY_ID=
+TAURUS_DYNAMODB_AWS_SECRET_ACCESS_KEY=
+MONITORED_RESOURCE=
 ```
 
 ### Running monitors
@@ -107,20 +110,6 @@ the following, substituting correct environment variable values:
 
 ```
 docker run \
-    -e DB_HOST=... \
-    -e DB_USER=... \
-    -e DB_PASSWORD=... \
-    -e MODELS_MONITOR_TAURUS_API_KEY=... \
-    -e MODELS_MONITOR_TAURUS_MODELS_URL=... \
-    -e MODELS_MONITOR_EMAIL_AWS_REGION=... \
-    -e MODELS_MONITOR_EMAIL_SES_ENDPOINT=... \
-    -e MODELS_MONITOR_EMAIL_SENDER_ADDRESS=... \
-    -e MODELS_MONITOR_EMAIL_RECIPIENTS=... \
-    -e MODELS_MONITOR_TAURUS_DYNAMODB_REGION=... \
-    -e MODELS_MONITOR_TAURUS_DYNAMODB_AWS_ACCESS_KEY_ID=... \
-    -e MODELS_MONITOR_TAURUS_DYNAMODB_AWS_SECRET_ACCESS_KEY=... \
+    --env-file=monitoring-infrastructure.env \
     taurus-monitoring:latest 
 ```
-
-Alternatively, define the same environment variables in a separate file
-along with `--env-file` (see https://docs.docker.com/engine/reference/commandline/run/)

@@ -232,14 +232,11 @@ class ModelLatencyChecker(MonitorDispatcher):
 
     self.config = loadConfig(options)
     self.emailParams = loadEmailParamsFromConfig(self.config)
-    self.apiKey = self.config.get("S1", "MODELS_MONITOR_TAURUS_API_KEY")
-    self.modelsUrl = self.config.get("S1", "MODELS_MONITOR_TAURUS_MODELS_URL")
-    self.awsDynamoDBRegion = self.config.get(
-      "S1", "MODELS_MONITOR_TAURUS_DYNAMODB_REGION")
-    self.awsAccessKeyId = self.config.get(
-      "S1", "MODELS_MONITOR_TAURUS_DYNAMODB_AWS_ACCESS_KEY_ID")
-    self.awsSecretAccessKey = self.config.get(
-      "S1", "MODELS_MONITOR_TAURUS_DYNAMODB_AWS_SECRET_ACCESS_KEY")
+    self.apiKey = self.config.get("S1", "TAURUS_API_KEY")
+    self.modelsUrl = self.config.get("S1", "TAURUS_MODELS_URL")
+    self.awsDynamoDBRegion = self.config.get("S1", "TAURUS_DYNAMODB_REGION")
+    self.awsAccessKeyId = self.config.get("S1", "TAURUS_DYNAMODB_AWS_ACCESS_KEY_ID")
+    self.awsSecretAccessKey = self.config.get("S1", "TAURUS_DYNAMODB_AWS_SECRET_ACCESS_KEY")
     self.threshold = options.threshold
     self.sigmaMultiplier = options.sigmaMultiplier
 
