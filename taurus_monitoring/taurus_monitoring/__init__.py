@@ -77,15 +77,12 @@ def loadEmailParamsFromConfig(config):
     `sesEndpoint`, `awsAccessKeyId`, and `awsSecretAccessKey` keys.
   """
   return dict(
-    senderAddress=(
-      config.get("S1", "MODELS_MONITOR_EMAIL_SENDER_ADDRESS")),
-    recipients=config.get("S1", "MODELS_MONITOR_EMAIL_RECIPIENTS"),
-    awsRegion= config.get("S1", "MODELS_MONITOR_EMAIL_AWS_REGION"),
-    sesEndpoint=config.get("S1", "MODELS_MONITOR_EMAIL_SES_ENDPOINT"),
-    awsAccessKeyId=(
-      config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_ACCESS_KEY_ID")),
-    awsSecretAccessKey=(
-      config.get("S1", "MODELS_MONITOR_EMAIL_SES_AWS_SECRET_ACCESS_KEY"))
+    senderAddress=config.get("S1", "EMAIL_SENDER_ADDRESS"),
+    recipients=config.get("S1", "EMAIL_RECIPIENTS"),
+    awsRegion= config.get("S1", "EMAIL_AWS_REGION"),
+    sesEndpoint=config.get("S1", "EMAIL_SES_ENDPOINT"),
+    awsAccessKeyId=config.get("S1", "EMAIL_SES_AWS_ACCESS_KEY_ID"),
+    awsSecretAccessKey=config.get("S1", "EMAIL_SES_AWS_SECRET_ACCESS_KEY")
   )
 
 
@@ -103,10 +100,10 @@ class MonitorOptionParser(OptionParser):
                     help=("Specify full path to ConfigParser-compatible"
                           " monitor conf file, containing a [S1] section and"
                           " the following configuration directives:\n\n"
-                          "MODELS_MONITOR_EMAIL_SENDER_ADDRESS\n"
-                          "MODELS_MONITOR_EMAIL_RECIPIENTS\n"
-                          "MODELS_MONITOR_EMAIL_AWS_REGION\n"
-                          "MODELS_MONITOR_EMAIL_SES_ENDPOINT"))
+                          "EMAIL_SENDER_ADDRESS\n"
+                          "EMAIL_RECIPIENTS\n"
+                          "EMAIL_AWS_REGION\n"
+                          "EMAIL_SES_ENDPOINT"))
     self.add_option("--loggingLevel",
                     help=("Specify logging level: DEBUG, INFO, WARNING, ERROR,"
                           " or CRITICAL"),
