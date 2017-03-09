@@ -22,6 +22,11 @@
 
 set -o errexit
 
+# nupic.bindings 0.2.1 (required by nupic 0.3.4) is not installable w/ pip.
+# Install explicitly w/ easy_install, which will install from .egg (as opposed
+# to .whl)
+easy_install nupic.bindings==0.2.1
+
 pip install -e ./nta.utils \
             -e ./htmengine \
             -e ./taurus_engine
