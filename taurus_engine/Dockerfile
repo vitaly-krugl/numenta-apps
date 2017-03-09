@@ -43,6 +43,9 @@ COPY htmengine /opt/numenta/htmengine
 COPY taurus_engine /opt/numenta/taurus_engine
 COPY install-taurus.sh /opt/numenta/
 
+# OPF needs this
+ENV USER docker
+
 # Install taurus
 WORKDIR /opt/numenta
 RUN ./install-taurus.sh
