@@ -34,6 +34,6 @@ pip install numpy==1.9.2
 easy_install nupic.bindings==0.2.1
 
 pip install -e ./nta.utils \
-            -e ./htmegine \
+            -e ./htmengine \
             -e ./taurus_engine \
             -e ./taurus_monitoring
