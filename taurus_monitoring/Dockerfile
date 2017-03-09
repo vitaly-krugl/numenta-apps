@@ -17,16 +17,19 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
-FROM ubuntu:16.04
+FROM ubuntu:14.04
 
 # OS-level dependencies
 RUN apt-get update && \
-    apt-get -y install python-software-properties \
-                       software-properties-common \
+    apt-get -y install apt-transport-https \
+                       build-essential \
+                       libffi-dev \
                        libmysqlclient-dev \
+                       libssl-dev \
                        python2.7 \
                        python2.7-dev \
-                       build-essential \
+                       python-software-properties \
+                       software-properties-common \
                        wget
 
 RUN wget http://releases.numenta.org/pip/1ebd3cb7a5a3073058d0c9552ab074bd/get-pip.py -O - | python
