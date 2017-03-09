@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------
-# Copyright (C) 2016, Numenta, Inc.  Unless you have purchased from
+# Copyright (C) 2016-2017, Numenta, Inc.  Unless you have purchased from
 # Numenta, Inc. a separate commercial license for this software code, the
 # following terms and conditions apply:
 #
@@ -18,28 +18,33 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
-# See https://hub.docker.com/r/numenta/nupic for details of official public
-# build of image from https://github.com/numenta/nupic/blob/master/Dockerfile
-FROM numenta/nupic:latest
+FROM ubuntu:14.04
 
-# OS-level dependencies
+# Install dependencies
 RUN apt-get update && \
-    apt-get -y install apt-transport-https \
+    apt-get install -y apt-transport-https \
                        build-essential \
-                       python-software-properties \
-                       software-properties-common \
                        libmysqlclient-dev \
-                       python-dev \
                        libffi-dev \
                        libssl-dev \
-                       nginx
+                       nginx \
+                       python2.7 \
+                       python2.7-dev \
+                       python-software-properties \
+                       software-properties-common \
+                       wget
 
+RUN wget http://releases.numenta.org/pip/1ebd3cb7a5a3073058d0c9552ab074bd/get-pip.py -O - | python
+RUN pip install --upgrade setuptools wheel
 
 # Copy taurus-relevant numenta-apps subdirs to image
 COPY nta.utils /opt/numenta/nta.utils
 COPY htmengine /opt/numenta/htmengine
 COPY taurus_engine /opt/numenta/taurus_engine
 COPY install-taurus.sh /opt/numenta/
+
+# OPF needs this
+ENV USER docker
 
 # Install taurus
 WORKDIR /opt/numenta
@@ -73,4 +78,3 @@ ENTRYPOINT ["/opt/numenta/taurus_engine/docker/entrypoint.sh"]
 CMD ["/opt/numenta/taurus_engine/docker/run.sh"]
 VOLUME ["/opt/numenta/taurus_engine/logs", \
         "/root/taurus_model_checkpoints"]
-

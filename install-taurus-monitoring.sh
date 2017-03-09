@@ -20,17 +20,20 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
+# Installs taurus monitors and other python dependencies.  Run from root of
+# numenta-apps repository checkout
+
 set -o errexit
 
-function install {
-  pushd $1
-    python setup.py develop --prefix=$2 --no-deps
-  popd
-}
+# nupic.bindings 0.2.1 (required by nupic 0.3.4) is not installable w/ pip.
+# Install explicitly w/ easy_install, which will install from .egg (as opposed
+# to .whl).  Meanwhile, nupic.bindings specifies numpy>=1.9.2, resulting in a
+# version (1.12.0) that is incompatible with nupic 0.3.4 so before that we'll
+# install explicit numpy==1.9.2 w/ pip
+pip install numpy==1.9.2
+easy_install nupic.bindings==0.2.1
 
-pip install -r taurus_monitoring/requirements.txt
-
-install nta.utils $1
-install htmengine $1
-install taurus_engine $1
-install taurus_monitoring $1
+pip install -e ./nta.utils \
+            -e ./htmegine \
+            -e ./taurus_engine \
+            -e ./taurus_monitoring
