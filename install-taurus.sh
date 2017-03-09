@@ -24,7 +24,10 @@ set -o errexit
 
 # nupic.bindings 0.2.1 (required by nupic 0.3.4) is not installable w/ pip.
 # Install explicitly w/ easy_install, which will install from .egg (as opposed
-# to .whl)
+# to .whl).  Meanwhile, nupic.bindings specifies numpy>=1.9.2, resulting in a
+# version (1.12.0) that is incompatible with nupic 0.3.4 so before that we'll
+# install explicit numpy==1.9.2 w/ pip
+pip install numpy==1.9.2
 easy_install nupic.bindings==0.2.1
 
 pip install -e ./nta.utils \
