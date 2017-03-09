@@ -20,6 +20,9 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
+# Installs taurus engine and other python dependencies.  Run from root of
+# numenta-apps repository checkout
+
 set -o errexit
 
 # nupic.bindings 0.2.1 (required by nupic 0.3.4) is not installable w/ pip.

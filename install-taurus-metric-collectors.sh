@@ -20,6 +20,9 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
+# Installs taurus collectors and other python dependencies.  Run from root of
+# numenta-apps repository checkout
+
 set -o errexit
 
 pip install -e ./nta.utils \
