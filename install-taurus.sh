@@ -22,12 +22,6 @@
 
 set -o errexit
 
-function install {
-  pushd $1
-  python setup.py develop --prefix=$2
-  popd
-}
-
-install nta.utils $1
-install htmengine $1
-install taurus_engine $1
+pip install -e ./nta.utils \
+            -e ./htmengine \
+            -e ./taurus_engine

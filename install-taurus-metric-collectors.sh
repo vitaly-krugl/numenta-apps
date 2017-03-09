@@ -20,19 +20,7 @@
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
 
-# Install taurus_metric_collectors and its dependencies
-# ARGS:
-# First position arg: installation prefix;
-#   e.g., Linux: /opt/numenta/anaconda
-#   e.g., Mac OS X: ~/Library/Python/2.7
-
 set -o errexit
 
-function install {
-  pushd $1
-  python setup.py develop --prefix=$2
-  popd
-}
-
-install nta.utils $1
-install taurus_metric_collectors $1
+pip install -e ./nta.utils \
+            -e ./taurus_metric_collectors

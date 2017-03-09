@@ -22,15 +22,7 @@
 
 set -o errexit
 
-function install {
-  pushd $1
-    python setup.py develop --prefix=$2 --no-deps
-  popd
-}
-
-pip install -r taurus_monitoring/requirements.txt
-
-install nta.utils $1
-install htmengine $1
-install taurus_engine $1
-install taurus_monitoring $1
+pip install -e ./nta.utils \
+            -e ./htmegine \
+            -e ./taurus_engine \
+            -e ./taurus_monitoring

@@ -1,6 +1,5 @@
 alembic==0.6.7
 mysql-python==1.2.5
-nta.utils
 pytz==2015.7
 requests==2.0.1
 sqlalchemy==0.9.4
