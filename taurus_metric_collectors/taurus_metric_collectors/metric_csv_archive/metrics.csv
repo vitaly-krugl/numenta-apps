@@ -123,7 +123,7 @@ NSC,NYSE,Norfolk Southern Corp,Norfolk Southern,0.25%,2.1K,$239.9K,@nscorp,,,
 MU,NASDAQ,Micron Technology Inc,Micron Technology,0.24%,7.2K,$237.7K,@MicronTech,,,
 ADBE,NASDAQ,Adobe Systems Inc,Adobe Systems,0.24%,3.4K,$237.5K,@Adobe,,,
 ANTM,NYSE,Anthem Inc,Anthem,0.24%,1.9K,$236.7K,@AnthemInc,,,
-KHC,NASDAQ,Kraft Heinz Co,Kraft Heinz Company,0.24%,4.0K,$233.6K,@KraftFoods,,,
+KHC,NASDAQ,Kraft Heinz Co,Kraft Heinz Company,0.24%,4.0K,$233.6K,@kraftrecipes,,,
 ADM,NYSE,Archer-Daniels Midland Co,Archer-Daniels Midland,0.24%,4.4K,$230.4K,@ADMUpdates,,,
 JCI,NYSE,Johnson Controls Inc,Johnson Controls,0.23%,4.5K,$224.3K,@JohnsonControls,,,
 REGN,NASDAQ,Regeneron Pharmaceuticals Inc,Regeneron Pharmaceuticals,0.23%,533,$221.3K,@RegeneronPharma,,,
@@ -139,7 +139,7 @@ AAL,NASDAQ,American Airlines Group Inc,American Airlines Group,0.22%,4.8K,$213.7
 VIAB,NASDAQ,Viacom Inc Class B,Viacom Class B,0.22%,2.9K,$212.9K,@Viacom,,,
 DE,NYSE,Deere & Co,Deere & Co,0.22%,2.5K,$211.9K,@JohnDeere,,,
 EXC,NYSE,Exelon Corp,Exelon,0.21%,5.8K,$208.5K,@Exelon,,,
-MMC,NYSE,Marsh & McLennan Companies Inc,Marsh & McLennan Companies,0.21%,3.7K,$206.8K,@MMA_pbs,@MMAUpperMidwest,@MMA_FL,@MMAnewengland
+MMC,NYSE,Marsh & McLennan Companies Inc,Marsh & McLennan Companies,0.21%,3.7K,$206.8K,@MMA_pbs,@MMAUpperMidwest,@MMA_FL,@MMA_Northeast
 AET,NYSE,Aetna Inc,Aetna,0.21%,2.4K,$206.7K,@Aetna,,,
 NOV,NYSE,National Oilwell Varco Inc,National Oilwell Varco,0.21%,2.9K,$206.6K,@NOVGlobal,,,
 APD,NYSE,Air Products & Chemicals Inc,Air Products & Chemicals,0.21%,1.4K,$203.3K,@airproducts,,,
