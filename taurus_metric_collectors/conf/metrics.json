@@ -3714,7 +3714,7 @@
         }, 
         "provider": "twitter", 
         "screenNames": [
-          "KraftFoods"
+          "kraftrecipes"
         ]
       }, 
       "XIGNITE.KHC.CLOSINGPRICE": {
@@ -3962,7 +3962,7 @@
           "MMA_pbs", 
           "MMAUpperMidwest", 
           "MMA_FL", 
-          "MMAnewengland"
+          "MMA_Northeast"
         ]
       }, 
       "XIGNITE.MMC.CLOSINGPRICE": {
