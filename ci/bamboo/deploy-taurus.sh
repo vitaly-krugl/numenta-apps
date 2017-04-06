@@ -68,6 +68,7 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --rm \
   -p 8001:8001 \
   -v /taurus-permanent-storage/logs:/opt/numenta/taurus_metric_collectors/logs \
+  -w /opt/numenta \
   -e MYSQL_HOST=${bamboo_MYSQL_HOST} \
   -e MYSQL_USER=${bamboo_MYSQL_USER} \
   -e MYSQL_PASSWD=${bamboo_MYSQL_PASSWD_password} \
