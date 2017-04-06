@@ -68,7 +68,6 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --rm \
   -p 8001:8001 \
   -v /taurus-permanent-storage/logs:/opt/numenta/taurus_metric_collectors/logs \
-  -w /opt/numenta \
   -e MYSQL_HOST=${bamboo_MYSQL_HOST} \
   -e MYSQL_USER=${bamboo_MYSQL_USER} \
   -e MYSQL_PASSWD=${bamboo_MYSQL_PASSWD_password} \
@@ -90,7 +89,7 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   -e ERROR_REPORT_EMAIL_SENDER_ADDRESS=${bamboo_ERROR_REPORT_EMAIL_SENDER_ADDRESS} \
   -e ERROR_REPORT_EMAIL_SES_ENDPOINT=${bamboo_ERROR_REPORT_EMAIL_SES_ENDPOINT} \
   quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber} \
-  py.test taurus_metric_collectors/tests/deployment/resource_accessibility_test.py
+  "py.test /opt/numenta/taurus_metric_collectors/tests/deployment/resource_accessibility_test.py"
 
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --name taurus-metric-collectors \
