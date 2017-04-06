@@ -19,7 +19,9 @@ docker -H ${bamboo_capability_DockerHost} pull quay.io/numenta/taurus-metric-col
 docker -H ${bamboo_capability_DockerHost} inspect quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber}
 
 # Transition collector to hot_standby
+set +e
 RUNNING=$(docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} inspect --format="{{ .State.Running }}" taurus-metric-collectors 2> /dev/null)
+set -e
 
 if [ $? -eq 1 ]; then
   echo "Container 'taurus-metric-collectors' does not exist."
@@ -123,7 +125,9 @@ docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} exec taurus-engine py.test taurus_
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} exec taurus-metric-collectors py.test taurus_metric_collectors/tests/deployment/health_check_test.py
 
 # Transition taurus collector to active
+set +e
 RUNNING=$(docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} inspect --format="{{ .State.Running }}" taurus-metric-collectors 2> /dev/null)
+set -e
 
 if [ $? -eq 1 ]; then
   echo "Container 'taurus-metric-collectors' does not exist."
