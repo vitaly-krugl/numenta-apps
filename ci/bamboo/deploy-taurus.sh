@@ -62,7 +62,32 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} stop taurus-metric-collectors |
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} rm taurus-metric-collectors || true
 
 # Run collector resource accessibility deployment tests before starting services
-docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} exec taurus-metric-collectors py.test taurus_metric_collectors/tests/deployment/resource_accessibility_test.py
+docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
+  --rm \
+  -p 8001:8001 \
+  -v /taurus-permanent-storage/logs:/opt/numenta/taurus_metric_collectors/logs \
+  -e MYSQL_HOST=${bamboo_MYSQL_HOST} \
+  -e MYSQL_USER=${bamboo_MYSQL_USER} \
+  -e MYSQL_PASSWD=${bamboo_MYSQL_PASSWD_password} \
+  -e RABBITMQ_HOST=${bamboo_RABBITMQ_HOST} \
+  -e RABBITMQ_USER=${bamboo_RABBITMQ_USER_password} \
+  -e RABBITMQ_PASSWD=${bamboo_RABBITMQ_PASSWD_password} \
+  -e TAURUS_API_KEY=${bamboo_TAURUS_API_KEY} \
+  -e AWS_ACCESS_KEY_ID=${bamboo_AWS_ACCESS_KEY_ID_password} \
+  -e AWS_SECRET_ACCESS_KEY=${bamboo_AWS_SECRET_ACCESS_KEY_password} \
+  -e TAURUS_SERVER_HOST=${bamboo_TAURUS_HTM_SERVER} \
+  -e TAURUS_HTM_SERVER=${bamboo_TAURUS_HTM_SERVER} \
+  -e XIGNITE_API_TOKEN=${bamboo_XIGNITE_API_TOKEN_password} \
+  -e TAURUS_TWITTER_ACCESS_TOKEN=${bamboo_TAURUS_TWITTER_ACCESS_TOKEN_password} \
+  -e TAURUS_TWITTER_ACCESS_TOKEN_SECRET=${bamboo_TAURUS_TWITTER_ACCESS_TOKEN_SECRET_password} \
+  -e TAURUS_TWITTER_CONSUMER_KEY=${bamboo_TAURUS_TWITTER_CONSUMER_KEY_password} \
+  -e TAURUS_TWITTER_CONSUMER_SECRET=${bamboo_TAURUS_TWITTER_CONSUMER_SECRET_password} \
+  -e ERROR_REPORT_EMAIL_AWS_REGION=${bamboo_ERROR_REPORT_EMAIL_AWS_REGION} \
+  -e ERROR_REPORT_EMAIL_RECIPIENTS=${bamboo_ERROR_REPORT_EMAIL_RECIPIENTS} \
+  -e ERROR_REPORT_EMAIL_SENDER_ADDRESS=${bamboo_ERROR_REPORT_EMAIL_SENDER_ADDRESS} \
+  -e ERROR_REPORT_EMAIL_SES_ENDPOINT=${bamboo_ERROR_REPORT_EMAIL_SES_ENDPOINT} \
+  quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber} \
+  py.test taurus_metric_collectors/tests/deployment/resource_accessibility_test.py
 
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --name taurus-metric-collectors \
