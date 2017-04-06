@@ -32,8 +32,7 @@ fi
 # Deploy taurus engine docker container
 docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} stop taurus-engine || true
 docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} rm taurus-engine || true
-docker run \
-  -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} \
+docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} run \
   --name taurus-engine \
   -d \
   -p 2003:2003 \
@@ -61,8 +60,7 @@ docker run \
 # Deploy taurus collector docker container
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} stop taurus-metric-collectors || true
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} rm taurus-metric-collectors || true
-docker run \
-  -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} \
+docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --name taurus-metric-collectors \
   -d \
   -p 8001:8001 \
