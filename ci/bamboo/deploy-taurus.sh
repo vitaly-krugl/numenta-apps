@@ -60,6 +60,10 @@ docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} run \
 # Deploy taurus collector docker container
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} stop taurus-metric-collectors || true
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} rm taurus-metric-collectors || true
+
+# Run collector resource accessibility deployment tests before starting services
+docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} exec taurus-metric-collectors py.test taurus_metric_collectors/tests/deployment/resource_accessibility_test.py
+
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --name taurus-metric-collectors \
   -d \
@@ -90,8 +94,8 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
 # Run engine deployment tests
 docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} exec taurus-engine py.test taurus_engine/tests/deployment
 
-# Run collector deployment tests
-docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} exec taurus-metric-collectors py.test taurus_metric_collectors/tests/deployment
+# Run collector health check deployment tests
+docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} exec taurus-metric-collectors py.test taurus_metric_collectors/tests/deployment/health_check_test.py
 
 # Transition taurus collector to active
 RUNNING=$(docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} inspect --format="{{ .State.Running }}" taurus-metric-collectors 2> /dev/null)
