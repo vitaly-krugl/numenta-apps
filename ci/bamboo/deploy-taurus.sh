@@ -8,15 +8,10 @@ set -o nounset
 set -o errexit
 set -o xtrace
 
-# Robot pull Taurus engine Docker image from Quay registry
+# Robot pull Taurus engine, collector Docker images from Quay registry
 docker -H ${bamboo_capability_DockerHost} login -e="." -u=${bamboo_QUAY_ROBOT_name_password} -p=${bamboo_QUAY_ROBOT_token_password} quay.io
 docker -H ${bamboo_capability_DockerHost} pull quay.io/numenta/taurus-engine:${bamboo_buildNumber}
-docker -H ${bamboo_capability_DockerHost} inspect quay.io/numenta/taurus-engine:${bamboo_buildNumber}
-
-# Robot pull Taurus metric collectors Docker image from Quay registry
-docker -H ${bamboo_capability_DockerHost} login -e="." -u=${bamboo_QUAY_ROBOT_name_password} -p=${bamboo_QUAY_ROBOT_token_password} quay.io
 docker -H ${bamboo_capability_DockerHost} pull quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber}
-docker -H ${bamboo_capability_DockerHost} inspect quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber}
 
 # Transition collector to hot_standby
 set +e
@@ -59,7 +54,7 @@ docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} run \
   -e AWS_SECRET_ACCESS_KEY=${bamboo_AWS_SECRET_ACCESS_KEY_password} \
   quay.io/numenta/taurus-engine:${bamboo_buildNumber}
 
-# Deploy taurus collector docker container
+# Stop and remove taurus collector docker container
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} stop taurus-metric-collectors || true
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} rm taurus-metric-collectors || true
 
@@ -91,6 +86,7 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber} \
   "py.test /opt/numenta/taurus_metric_collectors/tests/deployment/resource_accessibility_test.py"
 
+# Run taurus collector docker container
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   --name taurus-metric-collectors \
   -d \
@@ -118,10 +114,10 @@ docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} run \
   -e ERROR_REPORT_EMAIL_SES_ENDPOINT=${bamboo_ERROR_REPORT_EMAIL_SES_ENDPOINT} \
   quay.io/numenta/taurus-metric-collectors:${bamboo_buildNumber}
 
-# Run engine deployment tests
+# Run engine deployment tests in already-running container
 docker -H ${bamboo_TAURUS_ENGINE_DOCKER_HOST} exec taurus-engine py.test taurus_engine/tests/deployment
 
-# Run collector health check deployment tests
+# Run collector health check deployment tests in already-running container
 docker -H ${bamboo_TAURUS_COLLECTOR_DOCKER_HOST} exec taurus-metric-collectors py.test taurus_metric_collectors/tests/deployment/health_check_test.py
 
 # Transition taurus collector to active
